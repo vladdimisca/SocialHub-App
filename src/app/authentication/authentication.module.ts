@@ -2,6 +2,7 @@
 import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
 import { AuthenticationRoutingModule } from './auth-routing.module';
+import { HttpClientModule } from '@angular/common/http';
 
 // components
 import { LoginComponent } from './login/login.component';
@@ -21,10 +22,11 @@ import { AuthenticationService } from './authentication.service';
   ],
   imports: [
     CommonModule,
-    AuthenticationRoutingModule
+    AuthenticationRoutingModule,
+    HttpClientModule
   ],
   exports: [],
-  providers: [AuthenticationService],
+  providers: [AuthenticationService, HttpClientModule],
   bootstrap: []
 })
 export class AuthenticationModule { }
