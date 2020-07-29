@@ -1,0 +1,79 @@
+.nav-class {
+    background-color: rgb(69, 0, 61);
+    padding-right: 1%;
+    width: 100%;
+    overflow: hidden;
+    z-index: 5;
+}
+
+.fa.fa-bars {
+    font-size: 36px;
+    color: grey;
+}
+
+.nav-link {
+    float: left;
+}
+
+.nav-item.nav-link {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    text-align: center;
+    color: whitesmoke;
+    margin-left: 1%;
+    margin-right: 1%;
+    border-right: 1px solid #827985;
+}
+
+.nav-item.nav-link:last-child {
+    border-right: none;
+}
+
+.nav-item.nav-link:hover {
+    border-radius: 5px;
+    background-color: rgb(69, 0, 85);
+}
+
+input {
+    margin-top: 1%;
+    margin-bottom: 1%;
+    width: 50%;
+}
+
+.navbar-brand {
+    font-family: 'Nosifer';
+    color: whitesmoke;
+    padding-top: 1%;
+}
+
+#left {
+    width: 60%;
+}
+
+@media only screen and (max-width: 767.98px) {
+    .nav-item.nav-link {
+        border-right: none;
+    }
+
+    #left {
+        width: 65%;
+    }
+
+    input {
+        width: 100%;
+    }
+}
+
+@media only screen and (max-width: 550px) {
+    #left {
+        width: 85%;
+    }
+}
+
+@media only screen and (max-width: 400px) {
+    #left {
+        width: 75%;
+    }
+}

@@ -1,0 +1,19 @@
+<nav class="navbar navbar-expand-md nav-class fixed-top">
+
+    <div class="navbar-nav" id="left">
+        <a routerLink="" class="navbar-brand">Social Hub</a>
+        <input *ngIf="navLinks" class="nav-item" type="text" id="search-bar" name="search-bar" placeholder="Search">
+    </div>
+
+    <button type="button" class="navbar-toggler" data-toggle="collapse" data-target="#navbarCollapse">
+        <i class="fa fa-bars"></i>
+    </button>
+
+    <div *ngIf="navLinks" class="collapse navbar-collapse" id="navbarCollapse">
+        <div class="navbar-nav ml-auto">
+            <a href="" class="nav-item nav-link active">Home</a>
+            <a href="#" class="nav-item nav-link">Profile</a>
+            <a href="#" class="nav-item nav-link">Messages</a>
+        </div>
+    </div>
+</nav>

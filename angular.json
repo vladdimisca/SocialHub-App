@@ -123,6 +123,10 @@
           }
         }
       }
-    }},
-  "defaultProject": "Social-Network-App"
+    }
+  },
+  "defaultProject": "Social-Network-App",
+  "cli": {
+    "analytics": "9082bf6c-f7d5-4827-921a-941c3680217b"
+  }
 }
