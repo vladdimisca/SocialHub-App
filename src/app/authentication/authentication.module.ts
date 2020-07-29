@@ -7,6 +7,7 @@ import { AuthenticationRoutingModule } from './auth-routing.module';
 import { LoginComponent } from './login/login.component';
 import { RegisterComponent } from './register/register.component';
 import { NavbarComponent } from '../navbar/navbar.component';
+import { AboutComponent } from './about/about.component';
 
 // services
 import { AuthenticationService } from './authentication.service';
@@ -15,6 +16,7 @@ import { AuthenticationService } from './authentication.service';
   declarations: [
     LoginComponent,
     RegisterComponent,
+    AboutComponent,
     NavbarComponent
   ],
   imports: [
