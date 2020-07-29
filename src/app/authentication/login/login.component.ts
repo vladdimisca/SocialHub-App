@@ -27,7 +27,10 @@ export class LoginComponent {
         };
 
         this.authenticationService.login(user).subscribe(
-            (token) => { this.resetFields(); this.router.navigate(['/home']); }, // to be continued ...
+            (token) => {
+                this.resetFields();
+                this.router.navigate(['/home']);
+            }, // to be continued ...
             (err) => { console.log(err); }
         );
     }
