@@ -46,7 +46,7 @@ export class RegisterComponent {
                 this.resetFields(); 
                 this.router.navigate(['/']); 
             },
-            //(err) => this.userExists = true;
+            (err) => { console.log(err); }
         );
     }
 
