@@ -4,8 +4,8 @@ import { Routes, RouterModule } from '@angular/router';
 const routes: Routes = [
   {
     path: '',
-    loadChildren: () => import('./authentication/authentication.module').then(m => m.AuthenticationModule),
-  }
+    loadChildren: () => import('./authentication/authentication.module').then(m => m.AuthenticationModule)
+  },
 ];
 
 @NgModule({
