@@ -2,7 +2,10 @@
 
     <div class="navbar-nav" id="left">
         <a routerLink="" class="navbar-brand">Social Hub</a>
-        <input *ngIf="navLinks" class="nav-item" type="text" id="search-bar" name="search-bar" placeholder="Search">
+        <form *ngIf="navLinks" class="example">
+            <input type="text" placeholder="Search..." name="search">
+            <button type="submit"><i class="fa fa-search"></i></button>
+        </form>
     </div>
 
     <button type="button" class="navbar-toggler" data-toggle="collapse" data-target="#navbarCollapse">
@@ -11,9 +14,15 @@
 
     <div *ngIf="navLinks" class="collapse navbar-collapse" id="navbarCollapse">
         <div class="navbar-nav ml-auto">
-            <a href="" class="nav-item nav-link active">Home</a>
-            <a href="#" class="nav-item nav-link">Profile</a>
-            <a href="#" class="nav-item nav-link">Messages</a>
+            <a href="" class="nav-item nav-link active">
+                <i class='fas fa-home' style='font-size:26px'></i>
+            </a>
+            <a href="#" class="nav-item nav-link">
+                <i class='fas fa-user' style='font-size:26px'></i>
+            </a>
+            <a href="#" class="nav-item nav-link">
+                <i class='fas fa-comments' style='font-size:26px'></i>
+            </a>
         </div>
     </div>
 </nav>
