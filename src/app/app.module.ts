@@ -7,6 +7,9 @@ import { CommonModule } from '@angular/common';
 // components
 import { AppComponent } from './app.component';
 
+// services
+import { GlobalService } from './utils/global.service';
+
 @NgModule({
   declarations: [
     AppComponent 
@@ -14,9 +17,9 @@ import { AppComponent } from './app.component';
   imports: [
     CommonModule,
     BrowserModule,
-    AppRoutingModule
+    AppRoutingModule,
   ],
-  providers: [Title],
+  providers: [Title, GlobalService],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

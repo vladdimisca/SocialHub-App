@@ -31,7 +31,7 @@
 }
 
 .nav-item.nav-link:hover {
-    cursor: pointer;;
+    cursor: pointer;
 }
 
 input {
@@ -43,10 +43,13 @@ input {
 .navbar-brand {
     font-family: 'Nosifer';
     color: whitesmoke;
-    font-size: 135%;
     padding-top: 1%;
+    font-size: 110%;
 }
 
+#left {
+    width: 60%;
+}
 /* Styles for wrapping the search box */
 * {
     box-sizing: border-box;
@@ -89,9 +92,6 @@ input {
     display: table;
   }
 
-#left {
-    width: 60%;
-}
 
 @media only screen and (max-width: 767.98px) {
     .nav-item.nav-link {

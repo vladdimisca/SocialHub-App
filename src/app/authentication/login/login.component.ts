@@ -17,8 +17,8 @@ export class LoginComponent {
     ) {}
 
     // fields
-    private email: string;
-    private password: string;
+    email: string;
+    password: string;
 
     // validators
 
@@ -30,11 +30,11 @@ export class LoginComponent {
         };
 
         this.authenticationService.login(user).subscribe(
-            (token) => {
+            (success) => {
                 this.resetFields();
                 this.router.navigate(['/home']);
             }, // to be continued ...
-            (err) => { console.log(err); }
+            (error) => { console.log(error.error); }
         );
     }
 

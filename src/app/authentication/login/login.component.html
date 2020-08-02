@@ -1,28 +1,33 @@
-<app-navbar [navLinks]="true"></app-navbar>
+<app-navbar></app-navbar>
 
-<div id="app-about">
-	<app-about></app-about>
-</div>
-	
-<div class="login-form">
-	<form>
-		<h2>Sign in to your account</h2>
-		<hr>
-		<div class="form-group">
-			<div class="input-group">
-				<span class="input-group-text"><i class="fa fa-paper-plane"></i></span>
-				<input type="email" class="form-control" name="email" placeholder="Email Address" required="required">
-			</div>
+<div class = "row">
+	<div class = "column">
+		<app-about></app-about>
+	</div>
+	<div class="column">
+		<div class="login-form column">
+			<form ngNativeValidate (ngSubmit)="login()">
+				<h2>Sign in to your account</h2>
+				<hr>
+				<div class="form-group">
+					<div class="input-group">
+						<span class="input-group-text"><i class="fa fa-paper-plane"></i></span>
+						<input type="email" class="form-control" name="email" placeholder="Email Address" required="required"
+							[(ngModel)]="email">
+					</div>
+				</div>
+				<div class="form-group">
+					<div class="input-group">
+						<span class="input-group-text"><i class="fa fa-lock"></i></span>
+						<input type="password" class="form-control" name="password" placeholder="Password" required="required"
+							[(ngModel)]="password">
+					</div>
+				</div>
+				<div class="form-group text-center">
+					<button type="submit" class="btn btn-primary btn-lg">Sign in</button>
+				</div>
+				<div class="text-center">Don't have an account? <a routerLink="register">Register here</a></div>
+			</form>
 		</div>
-		<div class="form-group">
-			<div class="input-group">
-				<span class="input-group-text"><i class="fa fa-lock"></i></span>
-				<input type="password" class="form-control" name="password" placeholder="Password" required="required">
-			</div>
-		</div>
-		<div class="form-group text-center">
-			<button type="submit" class="btn btn-primary btn-lg">Sign in</button>
-		</div>
-		<div class="text-center">Don't have an account? <a routerLink="register">Register here</a></div>
-	</form>
+	</div>
 </div>

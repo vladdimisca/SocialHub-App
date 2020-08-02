@@ -1,7 +1,7 @@
 <nav class="navbar navbar-expand-md nav-class fixed-top">
 
     <div class="navbar-nav" id="left">
-        <a routerLink="" class="navbar-brand">Social Hub</a>
+        <a routerLink="/" class="navbar-brand">Social Hub</a>
         <form *ngIf="navLinks" class="example">
             <input type="text" placeholder="Search..." name="search">
             <button type="submit"><i class="fa fa-search"></i></button>
@@ -14,14 +14,20 @@
 
     <div *ngIf="navLinks" class="collapse navbar-collapse" id="navbarCollapse">
         <div class="navbar-nav ml-auto">
-            <a href="" class="nav-item nav-link active">
-                <i class='fas fa-home' style='font-size:26px'></i>
+            <a routerLink="/" class="nav-item nav-link active">
+                <i class='fas fa-home' style='font-size:20px'></i>
             </a>
             <a href="#" class="nav-item nav-link">
-                <i class='fas fa-user' style='font-size:26px'></i>
+                <i class='fas fa-user' style='font-size:20px'></i>
             </a>
             <a href="#" class="nav-item nav-link">
-                <i class='fas fa-comments' style='font-size:26px'></i>
+                <i class='fas fa-comments' style='font-size:20px'></i>
+            </a>
+            <a href="#" class="nav-item nav-link">
+                <i class='fas fa-users' style='font-size:20px'></i>
+            </a>
+            <a href="#" class="nav-item nav-link">
+                <i class='fas fa-bell' style='font-size:20px'></i>
             </a>
         </div>
     </div>

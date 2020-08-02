@@ -16,19 +16,19 @@ export class RegisterComponent {
     ) {}
 
     // fields
-    private firstName: string;
-    private lastName: string;
-    private email: string;
-    private password: string;
-    private validatePassword: string;
+    firstName: string;
+    lastName: string;
+    email: string;
+    password: string;
+    validatePassword: string;
 
     // validators
     private existingEmail: boolean;
     private passwordsNotMatching: boolean;
 
-    registerUser() {
+    registerUser(): void {
         this.resetValidators();
-
+        
         if(this.password !== this.validatePassword) {
             this.passwordsNotMatching = true;
             return;
@@ -42,15 +42,15 @@ export class RegisterComponent {
         };
 
         this.authenticationService.register(user).subscribe(
-            (token) => { 
+            (success) => { 
                 this.resetFields(); 
                 this.router.navigate(['/']); 
             },
-            (err) => { console.log(err); }
+            (error) => { console.log(error.error); }
         );
     }
 
-    resetFields() {
+    resetFields(): void {
         this.firstName = '';
         this.lastName = '';
         this.email = '';
@@ -58,7 +58,7 @@ export class RegisterComponent {
         this.validatePassword = '';
     }
 
-    resetValidators() {
+    resetValidators(): void {
         this.existingEmail = false;
         this.passwordsNotMatching = false;
     }
