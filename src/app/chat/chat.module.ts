@@ -8,6 +8,7 @@ import { NavbarModule } from '../navbar/navbar.module';
 // components
 import { InboxComponent } from './inbox/inbox.component';
 import { MessagesComponent } from './messages/messages.component';
+import { DirectMessageComponent } from './directMessage/directMessage.component';
 
 // services
 import { GlobalService } from '../utils/global.service';
@@ -15,7 +16,8 @@ import { GlobalService } from '../utils/global.service';
 @NgModule({
     declarations: [
         InboxComponent,
-        MessagesComponent
+        MessagesComponent,
+        DirectMessageComponent
     ],
     imports: [
         CommonModule,

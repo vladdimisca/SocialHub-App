@@ -1,4 +1,13 @@
 <app-navbar [navLinks]="true"></app-navbar>
 <div class = "messages">
-    <app-messages></app-messages>
+    <div class="container-fluid h-100">
+        <div class="row justify-content-center h-100">
+            <div class="col-md-4 col-xl-3 chat">
+                <app-messages></app-messages>
+            </div>
+			<div class="col-md-8 col-xl-6 chat">
+                <app-directMessage></app-directMessage>  
+            </div>
+        </div>
+    </div>
 </div>
