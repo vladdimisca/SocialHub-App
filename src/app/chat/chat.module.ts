@@ -8,7 +8,7 @@ import { NavbarModule } from '../navbar/navbar.module';
 // components
 import { InboxComponent } from './inbox/inbox.component';
 import { MessagesComponent } from './messages/messages.component';
-import { DirectMessageComponent } from './directMessage/directMessage.component';
+import { DirectMessageComponent } from './direct-message/direct-message.component';
 
 // services
 import { GlobalService } from '../utils/global.service';
