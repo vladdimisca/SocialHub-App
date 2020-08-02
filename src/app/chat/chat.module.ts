@@ -7,13 +7,15 @@ import { NavbarModule } from '../navbar/navbar.module';
 
 // components
 import { InboxComponent } from './inbox/inbox.component';
+import { MessagesComponent } from './messages/messages.component';
 
 // services
 import { GlobalService } from '../utils/global.service';
 
 @NgModule({
     declarations: [
-        InboxComponent
+        InboxComponent,
+        MessagesComponent
     ],
     imports: [
         CommonModule,
