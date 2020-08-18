@@ -1,8 +1,9 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 
 // services
 import { AuthenticationService } from '../authentication.service';
+import { GlobalService } from 'src/app/utils/global.service';
 
 @Component({
     selector: 'app-register',
@@ -12,6 +13,7 @@ import { AuthenticationService } from '../authentication.service';
 export class RegisterComponent {
     constructor(
         private authenticationService: AuthenticationService,
+        private globalService: GlobalService,
         private router: Router
     ) {}
 
@@ -23,14 +25,10 @@ export class RegisterComponent {
     validatePassword: string;
 
     // validators
-    private existingEmail: boolean;
-    private passwordsNotMatching: boolean;
+    messageToDisplay: string;
 
     registerUser(): void {
-        this.resetValidators();
-        
         if(this.password !== this.validatePassword) {
-            this.passwordsNotMatching = true;
             return;
         }
 
@@ -56,10 +54,5 @@ export class RegisterComponent {
         this.email = '';
         this.password = '';
         this.validatePassword = '';
-    }
-
-    resetValidators(): void {
-        this.existingEmail = false;
-        this.passwordsNotMatching = false;
     }
 }

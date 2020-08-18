@@ -1,19 +1,19 @@
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
+import { CookieService } from 'ngx-cookie-service';
 
 @Injectable()
 export class GlobalService {
-    private currentUser: string;
-
     constructor(
-        private router: Router
+        private router: Router,
+        private cookieService: CookieService
     ) {}
 
-    setCurrentUser(user: string) {
-        this.currentUser = user;
+    setCurrentUser(user: string): void {
+        this.cookieService.set('currentUser', user);
     }
 
-    getCurrentUser() {
-        return this.currentUser;
+    getCurrentUser(): string {
+        return this.cookieService.get('currentUser');
     }
 }

@@ -3,9 +3,11 @@ import { Routes, RouterModule } from '@angular/router';
 
 // components
 import { InboxComponent } from './inbox/inbox.component';
+import { ConversationComponent } from './conversation/conversation.component';
 
 const routes: Routes = [
-    {path: 'inbox', component: InboxComponent, data: {title: 'Inbox'}}
+    {path: 'inbox', component: InboxComponent, data: {title: 'Inbox'}},
+    {path: 'conversation', component: ConversationComponent, data: {title: 'Conversation'}}
 ];
 
 @NgModule({

@@ -3,7 +3,7 @@ import { Router } from '@angular/router';
 
 // services
 import { AuthenticationService } from '../authentication.service';
-
+import { GlobalService } from 'src/app/utils/global.service';
 
 @Component({
     selector: 'app-login',
@@ -13,6 +13,7 @@ import { AuthenticationService } from '../authentication.service';
 export class LoginComponent { 
     constructor(
         private authenticationService: AuthenticationService,
+        private globalService: GlobalService,
         private router: Router
     ) {}
 
@@ -31,9 +32,11 @@ export class LoginComponent {
 
         this.authenticationService.login(user).subscribe(
             (success) => {
+                this.globalService.setCurrentUser(user.email);
+                console.log(this.globalService.getCurrentUser());
                 this.resetFields();
-                this.router.navigate(['/home']);
-            }, // to be continued ...
+                this.router.navigate(['/profile/' + user.email]);
+            }, 
             (error) => { console.log(error.error); }
         );
     }

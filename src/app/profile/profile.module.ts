@@ -7,13 +7,17 @@ import { NavbarModule } from '../navbar/navbar.module';
 
 // components
 import { UserProfileComponent } from './user-profile/user-profile.component';
+import { GalleryComponent } from './gallery/gallery.component';
+import { DetailsComponent } from './details/details.component';
 
 // services
 import { GlobalService } from '../utils/global.service';
 
 @NgModule({
     declarations: [
-        UserProfileComponent
+        UserProfileComponent,
+        GalleryComponent,
+        DetailsComponent
     ],
     imports: [
         CommonModule,

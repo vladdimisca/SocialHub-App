@@ -7,6 +7,9 @@ import { RouterModule } from '@angular/router';
 // components
 import { NavbarComponent } from './navbar.component';
 
+// services
+import { GlobalService } from '../utils/global.service';
+
 @NgModule({
     declarations: [
         NavbarComponent
@@ -16,7 +19,7 @@ import { NavbarComponent } from './navbar.component';
         RouterModule
     ],
     exports: [NavbarComponent],
-    providers: [],
+    providers: [GlobalService],
     bootstrap: []
 })
 export class NavbarModule {}

@@ -1,12 +1,10 @@
 body,html{
     height: 100%;
     margin: 0;
-    overflow-y: hidden;
 }
-
 h4{
     color: white;
-    text-align: center;
+    text-align: center;;
 }
 .chat{
     margin-top: auto;
@@ -173,15 +171,8 @@ font-size: 10px;
 position: relative;
 }
 
-@media(max-width: 780px) {
-    body, html{
-        overflow-y: scroll;
-    }
-}
-
 @media(max-width: 576px){
 .contacts_card{
 margin-bottom: 15px !important;
 }
 }
-
