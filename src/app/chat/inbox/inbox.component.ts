@@ -5,4 +5,10 @@ import { Component } from '@angular/core';
     templateUrl: './inbox.component.html',
     styleUrls: ['./inbox.component.scss']
 })
-export class InboxComponent {}
+export class InboxComponent {
+    uuid: string = '';
+
+    openConversation(event: string) {
+        this.uuid = event;
+    }
+}

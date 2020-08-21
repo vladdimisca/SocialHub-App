@@ -11,4 +11,20 @@ export class ChatService {
     getMessages(chatId: string): Observable<any> {
         return this.httpClient.get('http://localhost:3000/api/chat?chatId=' + chatId);
     }
+
+    getUsers(): Observable<any> {
+        return this.httpClient.get('http://localhost:3000/api/users');
+    }
+
+    getUUID(email: string): Observable<any> {
+        return this.httpClient.get('http://localhost:3000/api/userUUID?email=' + email);
+    }
+
+    getEmailByUUID(uuid: string): Observable<any> {
+        return this.httpClient.get('http://localhost:3000/api/userEmail?uuid=' + uuid);
+    }
+
+    getUserByUUID(uuid: string): Observable<any> {
+        return this.httpClient.get('http://localhost:3000/api/user?uuid=' + uuid)
+    }
 }

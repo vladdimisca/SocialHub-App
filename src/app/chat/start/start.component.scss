@@ -171,6 +171,10 @@ font-size: 10px;
 position: relative;
 }
 
+div.card-body.msg_card_body {
+    margin-top: 5%;
+}
+
 @media(max-width: 576px){
 .contacts_card{
 margin-bottom: 15px !important;

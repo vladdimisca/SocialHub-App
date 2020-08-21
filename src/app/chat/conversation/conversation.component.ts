@@ -5,4 +5,10 @@ import { Component } from '@angular/core';
     templateUrl: './conversation.component.html',
     styleUrls: ['./conversation.component.scss']
 })
-export class ConversationComponent {}
+export class ConversationComponent {
+    uuid: string = '';
+
+    openConversation(event: string) {
+        this.uuid = event;
+    }
+}

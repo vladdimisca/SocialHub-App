@@ -6,23 +6,24 @@
                 <span class="online_icon"></span>
             </div>
             <div class="user_info">
-                <span>{{ 1 + 1}}</span>
+                <span>{{ receiver.firstName + ' ' + receiver.lastName }}</span>
             </div>		
         </div>
     </div>
     
     <div class="card-body msg_card_body" id="msg-container">
-        
     </div>
+
+    <span id="typing-message" *ngIf="typingUser !== ''" >{{ typingUser }} is typing...</span>
 
     <div class="card-footer">
         <div class="input-group">
             <div class="input-group-append">
                 <span class="input-group-text attach_btn"><i class="fas fa-paperclip"></i></span>
             </div>
-            <textarea name="chat" class="form-control type_msg" placeholder="Type your message..." [(ngModel)]="messageText"></textarea>
+            <textarea (input)="userIsTyping()" (keyup.enter)="SendMessage($event)" name="chat" class="form-control type_msg" placeholder="Type your message..." [(ngModel)]="messageText" required ></textarea>
             <div class="input-group-append">
-                <span class="input-group-text send_btn" (click)="SendMessage()"><i class="fas fa-location-arrow"></i></span>
+                <span class="input-group-text send_btn"  (click)="SendMessage($event)"><i class="fas fa-location-arrow"></i></span>
             </div>
         </div>
     </div>

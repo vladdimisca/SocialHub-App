@@ -3,10 +3,10 @@
     <div class="container-fluid h-100">
         <div class="row justify-content-center h-100">
             <div class="col-md-4 col-xl-3 chat">
-                <app-messages></app-messages>
+                <app-messages (changeConversation)="openConversation($event)"></app-messages>
             </div>
 			<div class="col-md-8 col-xl-6 chat">
-                <app-start></app-start>    
+                <app-start [uuid]="uuid"></app-start>    
             </div>
         </div>
     </div>
