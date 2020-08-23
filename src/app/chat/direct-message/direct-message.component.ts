@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewEncapsulation, Input } from '@angular/core';
+import { Component, OnInit, ViewEncapsulation, Input, ChangeDetectorRef } from '@angular/core';
 import * as io from 'socket.io-client';
 
 // interfaces
@@ -45,6 +45,7 @@ export class DirectMessageComponent implements OnInit {
     };
     
     constructor(
+        private cd: ChangeDetectorRef,
         private route: ActivatedRoute,
         private router: Router,
         private globalService: GlobalService,
@@ -53,12 +54,20 @@ export class DirectMessageComponent implements OnInit {
     
     ngOnChanges() {
         if(this.receiverUUID !== '') {
-            this.router.navigate(['chat/' + this.receiverUUID]);  
+            let container = document.getElementById('msg-container');
+
+            while (container.firstChild) {
+                container.removeChild(container.firstChild);
+            }
+
+            this.router.navigate(['chat/inbox'], { skipLocationChange: true }).then(() => {
+                this.router.navigate(['chat/' + this.receiverUUID]);
+            });
         }
     }
 
     ngOnInit() {
-        this.router.routeReuseStrategy.shouldReuseRoute = () => false;
+        //this.router.routeReuseStrategy.shouldReuseRoute = () => false;
         this.route.params.subscribe((data: Params) => {
             this.chatService.getUserByUUID(data.conversation).subscribe((user: any) => {            
                 this.receiver.firstName = user.firstName;
@@ -103,7 +112,15 @@ export class DirectMessageComponent implements OnInit {
         let msgTime = document.createElement('span');
         msgTime.className = 'msg_time_send';
 
-        msgTime.innerHTML = new Date(msg.timestamp).toLocaleTimeString("en-US");
+        const date = new Date();
+
+        if(date.getTime() - msg.timestamp > 24 * 60 * 60 * 1000) {
+            msgTime.innerHTML = new Date(msg.timestamp).toLocaleDateString('en-GB') + ' '  + 
+                                        new Date(msg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        } else {
+            msgTime.innerHTML = new Date(msg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        }
+        
 
         message.appendChild(msgTime);
         wrapperDiv.appendChild(message);
@@ -133,10 +150,10 @@ export class DirectMessageComponent implements OnInit {
         const date = new Date();
 
         if(date.getTime() - message.timestamp > 24 * 60 * 60 * 1000) {
-            msgTimeSend.innerHTML = new Date(message.timestamp).toLocaleDateString("en-US") + ' ' +
-                                            new Date(message.timestamp).toLocaleTimeString("en-US");
+            msgTimeSend.innerHTML = new Date(message.timestamp).toLocaleDateString('en-GB') + ' ' +
+                                            new Date(message.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
         } else {
-            msgTimeSend.innerHTML = new Date(message.timestamp).toLocaleTimeString("en-US");
+            msgTimeSend.innerHTML = new Date(message.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
         }
                 
         messageDiv.appendChild(msgTimeSend);
@@ -156,7 +173,7 @@ export class DirectMessageComponent implements OnInit {
     userIsTyping(): void {
         if(this.typing === false) {
             this.typing = true;
-            this.socket.emit('type', this.chatId, this.globalService.getCurrentUser());
+            this.socket.emit('type', this.chatId, this.globalService.getCurrentUser(), this.receiver.email);
 
             this.timeout = setTimeout(() => {
                 this.stopTyping();
@@ -190,8 +207,10 @@ export class DirectMessageComponent implements OnInit {
             }
         });
 
-        this.socket.on('typing', (user: string) => {
-            this.typingUser = user;
+        this.socket.on('typing', (receiverEmail: string, firstName: string) => {
+            if(receiverEmail === this.globalService.getCurrentUser()) {
+                this.typingUser = firstName;
+            }  
         });
         
         this.socket.on('stopTyping', () => {
@@ -199,11 +218,14 @@ export class DirectMessageComponent implements OnInit {
         })
     }
 
-    SendMessage(event: Event): void { 
+    sendMessage(event: Event): void { 
         if(this.messageText.length < 1 || (this.messageText.length === 1 && event instanceof KeyboardEvent)) {
             this.messageText = '';
             return;
         }
+
+        clearTimeout(this.timeout);
+        this.stopTyping();
 
         this.message.chatId = this.chatId;
         this.message.sender = this.globalService.getCurrentUser();
@@ -217,8 +239,6 @@ export class DirectMessageComponent implements OnInit {
                 this.message.timestamp = date.getTime();
 
                 this.socket.emit('message', this.message);
-
-                this.addSenderMessage(this.message);
 
                 const messageBody = document.getElementById('msg-container');
                 messageBody.scrollTop = messageBody.scrollHeight - messageBody.clientHeight;

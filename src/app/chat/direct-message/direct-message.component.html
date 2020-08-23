@@ -21,9 +21,9 @@
             <div class="input-group-append">
                 <span class="input-group-text attach_btn"><i class="fas fa-paperclip"></i></span>
             </div>
-            <textarea (input)="userIsTyping()" (keyup.enter)="SendMessage($event)" name="chat" class="form-control type_msg" placeholder="Type your message..." [(ngModel)]="messageText" required ></textarea>
+            <textarea (input)="userIsTyping()" (keyup.enter)="sendMessage($event)" name="chat" class="form-control type_msg" placeholder="Type your message..." [(ngModel)]="messageText" required ></textarea>
             <div class="input-group-append">
-                <span class="input-group-text send_btn"  (click)="SendMessage($event)"><i class="fas fa-location-arrow"></i></span>
+                <span class="input-group-text send_btn"  (click)="sendMessage($event)"><i class="fas fa-location-arrow"></i></span>
             </div>
         </div>
     </div>
