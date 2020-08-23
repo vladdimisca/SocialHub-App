@@ -4,6 +4,7 @@ import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ProfileRoutingModule } from './profile-routing.module';
 import { NavbarModule } from '../navbar/navbar.module';
+import { HttpClientModule } from '@angular/common/http';
 
 // components
 import { UserProfileComponent } from './user-profile/user-profile.component';
@@ -12,6 +13,7 @@ import { DetailsComponent } from './details/details.component';
 
 // services
 import { GlobalService } from '../utils/global.service';
+import { ProfileService } from './profile.service';
 
 @NgModule({
     declarations: [
@@ -22,9 +24,10 @@ import { GlobalService } from '../utils/global.service';
     imports: [
         CommonModule,
         ProfileRoutingModule,
-        NavbarModule
+        NavbarModule,
+        HttpClientModule
     ],
-    providers: [GlobalService],
+    providers: [GlobalService, ProfileService],
     bootstrap: []
 })
 export class ProfileModule {}
