@@ -129,7 +129,7 @@ export class DirectMessageComponent implements OnInit {
         });  
     }
 
-    addSenderMessage(msg: any): void {
+    addSenderMessage(msg: Message): void {
         let wrapperDiv = document.createElement('div');
         wrapperDiv.className = 'd-flex justify-content-end mb-4';
 
@@ -138,7 +138,8 @@ export class DirectMessageComponent implements OnInit {
         message.innerHTML = msg.message;
 
         let msgTime = document.createElement('span');
-        msgTime.className = 'msg_time_send';
+        msgTime.className = 'msg_time_send text-right';
+        msgTime.style.width = '150px';
 
         const date = new Date();
 
@@ -156,7 +157,7 @@ export class DirectMessageComponent implements OnInit {
         msgContainer.appendChild(wrapperDiv);
     }
 
-    addReceiverMessage(message: any): void {
+    addReceiverMessage(message: Message): void {
         let wrapperDiv = document.createElement('div');
         wrapperDiv.className = "d-flex justify-content-start mb-4";
 
@@ -173,6 +174,7 @@ export class DirectMessageComponent implements OnInit {
                 
         let msgTimeSend = document.createElement('span');
         msgTimeSend.className = 'msg_time';
+        msgTimeSend.style.width = '150px';
 
         const date = new Date();
 
@@ -248,8 +250,8 @@ export class DirectMessageComponent implements OnInit {
         })
     }
 
-    sendMessage(event: Event): void { 
-        if(this.messageText.length < 1 || (this.messageText.length === 1 && event instanceof KeyboardEvent)) {
+    sendMessage(): void { 
+        if(!this.messageText.replace(/\s/g, '').length) {
             this.messageText = '';
             return;
         }
