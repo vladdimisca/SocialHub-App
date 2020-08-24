@@ -21,7 +21,6 @@ export class MessagesComponent implements OnInit {
 
     constructor(
         private route: ActivatedRoute,
-        private router: Router,
         private chatService: ChatService
     ) {}
 

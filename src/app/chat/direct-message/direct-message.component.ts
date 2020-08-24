@@ -71,7 +71,7 @@ export class DirectMessageComponent implements OnInit {
             // close the socket
             this.socket.close();
             
-            // these are !== undefined
+            // these are always !== undefined
             this.subsUser.unsubscribe();
             this.subsParams.unsubscribe();
             this.subsMessages.unsubscribe();
@@ -86,27 +86,16 @@ export class DirectMessageComponent implements OnInit {
             }
 
             this.router.navigate(['chat/' + this.receiverUUID]).then(() => {
-                this.subsParams = this.route.params.subscribe((data: Params) => {
-                    this.subsUser = this.chatService.getUserByUUID(data.conversation).subscribe((user: any) => {          
-                        this.receiver.firstName = user?.firstName;
-                        this.receiver.lastName = user?.lastName;
-                        this.receiver.email = user?.email;
-                    })
-        
-                    this.subsChatUUID = this.chatService.getUUID(this.globalService.getCurrentUser()).subscribe((success: any) => {
-                        this.chatId = success.uuid > data.conversation ?
-                                        data.conversation + '_' + success.uuid : 
-                                        success.uuid + '_' + data.conversation;
-        
-                        this.getMessages();   
-                        this.setupSocketConnection();
-                    });
-                }) 
+                this.setup();
             });
         } 
     }
 
     ngOnInit() {
+        this.setup();
+    }   
+
+    setup(): void {
         this.subsParams = this.route.params.subscribe((data: Params) => {
             this.subsUser = this.chatService.getUserByUUID(data.conversation).subscribe((user: any) => {          
                 this.receiver.firstName = user?.firstName;
