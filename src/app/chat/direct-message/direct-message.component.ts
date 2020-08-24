@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewEncapsulation, Input, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, ViewEncapsulation, Input } from '@angular/core';
 import * as io from 'socket.io-client';
 
 // interfaces
@@ -9,6 +9,7 @@ import { GlobalService } from '../../utils/global.service';
 import { ChatService } from '../chat.service';
 import { ActivatedRoute, Params, Router } from '@angular/router';
 import { UserDetails } from '../models/user-details.interface';
+import { Subscription } from 'rxjs';
 
 const SOCKET_ENDPOINT = 'localhost:3000/chat';
 
@@ -25,6 +26,13 @@ export class DirectMessageComponent implements OnInit {
     typing: boolean = false;
     timeout: any;
     typingUser: string = '';
+
+    subsParams: Subscription;
+    subsParams1: Subscription;
+    subsChatUUID: Subscription;
+    subsUser: Subscription;
+    subsEmail: Subscription;
+    subsMessages: Subscription;
 
     receiver: UserDetails = {
         uuid: '',
@@ -45,7 +53,6 @@ export class DirectMessageComponent implements OnInit {
     };
     
     constructor(
-        private cd: ChangeDetectorRef,
         private route: ActivatedRoute,
         private router: Router,
         private globalService: GlobalService,
@@ -56,26 +63,58 @@ export class DirectMessageComponent implements OnInit {
         if(this.receiverUUID !== '') {
             let container = document.getElementById('msg-container');
 
+            // clear the messages container
             while (container.firstChild) {
                 container.removeChild(container.firstChild);
             }
 
-            this.router.navigate(['chat/inbox'], { skipLocationChange: true }).then(() => {
-                this.router.navigate(['chat/' + this.receiverUUID]);
+            // close the socket
+            this.socket.close();
+            
+            // these are !== undefined
+            this.subsUser.unsubscribe();
+            this.subsParams.unsubscribe();
+            this.subsMessages.unsubscribe();
+            this.subsChatUUID.unsubscribe();
+
+            if(this.subsEmail !== undefined) {
+                this.subsEmail.unsubscribe();
+            }
+            
+            if(this.subsParams1 !== undefined) {
+                this.subsParams1.unsubscribe();
+            }
+
+            this.router.navigate(['chat/' + this.receiverUUID]).then(() => {
+                this.subsParams = this.route.params.subscribe((data: Params) => {
+                    this.subsUser = this.chatService.getUserByUUID(data.conversation).subscribe((user: any) => {          
+                        this.receiver.firstName = user?.firstName;
+                        this.receiver.lastName = user?.lastName;
+                        this.receiver.email = user?.email;
+                    })
+        
+                    this.subsChatUUID = this.chatService.getUUID(this.globalService.getCurrentUser()).subscribe((success: any) => {
+                        this.chatId = success.uuid > data.conversation ?
+                                        data.conversation + '_' + success.uuid : 
+                                        success.uuid + '_' + data.conversation;
+        
+                        this.getMessages();   
+                        this.setupSocketConnection();
+                    });
+                }) 
             });
-        }
+        } 
     }
 
     ngOnInit() {
-        //this.router.routeReuseStrategy.shouldReuseRoute = () => false;
-        this.route.params.subscribe((data: Params) => {
-            this.chatService.getUserByUUID(data.conversation).subscribe((user: any) => {            
-                this.receiver.firstName = user.firstName;
-                this.receiver.lastName = user.lastName;
-                this.receiver.email = user.email;
+        this.subsParams = this.route.params.subscribe((data: Params) => {
+            this.subsUser = this.chatService.getUserByUUID(data.conversation).subscribe((user: any) => {          
+                this.receiver.firstName = user?.firstName;
+                this.receiver.lastName = user?.lastName;
+                this.receiver.email = user?.email;
             })
 
-            this.chatService.getUUID(this.globalService.getCurrentUser()).subscribe((success: any) => {
+            this.subsChatUUID = this.chatService.getUUID(this.globalService.getCurrentUser()).subscribe((success: any) => {
                 this.chatId = success.uuid > data.conversation ?
                                 data.conversation + '_' + success.uuid : 
                                 success.uuid + '_' + data.conversation;
@@ -83,11 +122,11 @@ export class DirectMessageComponent implements OnInit {
                 this.getMessages();   
                 this.setupSocketConnection();
             });
-        })  
+        }) 
     }
 
     getMessages(): void {
-        this.chatService.getMessages(this.chatId).subscribe((messages: Message[]) => {
+        this.subsMessages = this.chatService.getMessages(this.chatId).subscribe((messages: Message[]) => {    
             messages.forEach(message => {
                 if(message.sender === this.globalService.getCurrentUser()) {
                     this.addSenderMessage(message);
@@ -121,7 +160,6 @@ export class DirectMessageComponent implements OnInit {
             msgTime.innerHTML = new Date(msg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
         }
         
-
         message.appendChild(msgTime);
         wrapperDiv.appendChild(message);
 
@@ -171,23 +209,25 @@ export class DirectMessageComponent implements OnInit {
     }
 
     userIsTyping(): void {
+        const time = 1000;
+
         if(this.typing === false) {
             this.typing = true;
             this.socket.emit('type', this.chatId, this.globalService.getCurrentUser(), this.receiver.email);
 
             this.timeout = setTimeout(() => {
                 this.stopTyping();
-            }, 2000);
+            }, time);
         } else {
             clearTimeout(this.timeout);
 
             this.timeout = setTimeout(() => {
                 this.stopTyping();
-            }, 2000);
+            }, time);
         }
     }
 
-    setupSocketConnection() {
+    setupSocketConnection(): void {
         this.socket = io(SOCKET_ENDPOINT);
 
         this.socket.on('connect', () => {
@@ -197,6 +237,7 @@ export class DirectMessageComponent implements OnInit {
         this.socket.on('message-broadcast', (message: Message) => {
             if (message !== undefined) {
                 if(message.sender === this.globalService.getCurrentUser()) {
+                    console.debug('Acii')
                     this.addSenderMessage(message);
                 } else {
                     this.addReceiverMessage(message);
@@ -224,20 +265,17 @@ export class DirectMessageComponent implements OnInit {
             return;
         }
 
-        clearTimeout(this.timeout);
-        this.stopTyping();
-
         this.message.chatId = this.chatId;
         this.message.sender = this.globalService.getCurrentUser();
         
-        this.route.params.subscribe((data: Params) => {
-            this.chatService.getEmailByUUID(data.conversation).subscribe((success: any) => {
+        this.subsParams1 = this.route.params.subscribe((data: Params) => {
+            this.subsEmail = this.chatService.getEmailByUUID(data.conversation).subscribe((success: any) => {
                 this.message.receiver = success.email;
                 this.message.message = this.messageText;
         
                 const date = new Date();
                 this.message.timestamp = date.getTime();
-
+            
                 this.socket.emit('message', this.message);
 
                 const messageBody = document.getElementById('msg-container');

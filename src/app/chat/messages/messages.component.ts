@@ -5,7 +5,7 @@ import { UserDetails } from '../models/user-details.interface';
 
 // services
 import { ChatService } from '../chat.service';
-import { ActivatedRoute, Params } from '@angular/router';
+import { ActivatedRoute, Params, Router } from '@angular/router';
 
 @Component({
     selector: 'app-messages',
@@ -21,6 +21,7 @@ export class MessagesComponent implements OnInit {
 
     constructor(
         private route: ActivatedRoute,
+        private router: Router,
         private chatService: ChatService
     ) {}
 
@@ -47,6 +48,8 @@ export class MessagesComponent implements OnInit {
     }
 
     openConversation(uuid: string): void {
-        this.changeConversation.emit(uuid);
+        if(this.currentUUID !== uuid) {
+           this.changeConversation.emit(uuid);
+        }
     }
 }

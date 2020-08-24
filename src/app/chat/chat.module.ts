@@ -24,7 +24,7 @@ import { ChatService } from '../chat/chat.service';
         MessagesComponent,
         DirectMessageComponent,
         ConversationComponent,
-        StartComponent
+        StartComponent,
     ],
     imports: [
         CommonModule,
