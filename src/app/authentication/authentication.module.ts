@@ -29,7 +29,7 @@ import { GlobalService } from '../utils/global.service';
     NavbarModule
   ],
   exports: [],
-  providers: [AuthenticationService, HttpClientModule, GlobalService],
+  providers: [AuthenticationService, GlobalService],
   bootstrap: []
 })
 export class AuthenticationModule { }

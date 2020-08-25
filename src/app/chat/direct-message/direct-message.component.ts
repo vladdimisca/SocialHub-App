@@ -228,7 +228,6 @@ export class DirectMessageComponent implements OnInit {
         this.socket.on('message-broadcast', (message: Message) => {
             if (message !== undefined) {
                 if(message.sender === this.globalService.getCurrentUser()) {
-                    console.debug('Acii')
                     this.addSenderMessage(message);
                 } else {
                     this.addReceiverMessage(message);
