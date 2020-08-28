@@ -12,6 +12,7 @@ import { UserDetails } from '../models/user-details.interface';
 import { Subscription } from 'rxjs';
 
 const SOCKET_ENDPOINT = 'localhost:3000/chat';
+const USERS_SOCKET = 'localhost:3000/user-status';
 
 @Component({
     selector: 'app-direct-message',
@@ -21,11 +22,13 @@ const SOCKET_ENDPOINT = 'localhost:3000/chat';
 })
 export class DirectMessageComponent implements OnInit { 
     private socket: io;
+    private userSocket: io;
     messageText: string = '';
     chatId: string = '';
     typing: boolean = false;
     timeout: any;
     typingUser: string = '';
+    onlineUsers: string[] = [];
 
     subsParams: Subscription;
     subsParams1: Subscription;
@@ -45,11 +48,13 @@ export class DirectMessageComponent implements OnInit {
     receiverUUID: string;
 
     private message: Message = {
+        messageId: undefined,
         chatId: undefined,
         sender: undefined,
         receiver: undefined,
         message: undefined,
-        timestamp: undefined
+        timestamp: undefined,
+        seen: false
     };
     
     constructor(
@@ -63,13 +68,14 @@ export class DirectMessageComponent implements OnInit {
         if(this.receiverUUID !== '') {
             let container = document.getElementById('msg-container');
 
-            // clear the messages container
+            // clear the messages' container
             while (container.firstChild) {
                 container.removeChild(container.firstChild);
             }
 
-            // close the socket
+            // close the sockets
             this.socket.close();
+            this.userSocket.close();
             
             // these are always !== undefined
             this.subsUser.unsubscribe();
@@ -115,15 +121,16 @@ export class DirectMessageComponent implements OnInit {
     }
 
     getMessages(): void {
-        this.subsMessages = this.chatService.getMessages(this.chatId).subscribe((messages: Message[]) => {    
+        this.subsMessages = this.chatService.getMessages(this.chatId).subscribe((messages: Message[]) => {   
+            const messageBody = document.getElementById('msg-container');
+
             messages.forEach(message => {
                 if(message.sender === this.globalService.getCurrentUser()) {
                     this.addSenderMessage(message);
                 } else {
                     this.addReceiverMessage(message);
                 }
-
-                const messageBody = document.getElementById('msg-container');
+                
                 messageBody.scrollTop = messageBody.scrollHeight - messageBody.clientHeight;
             });
         });  
@@ -136,6 +143,11 @@ export class DirectMessageComponent implements OnInit {
         let message = document.createElement('div');
         message.className = 'msg_cotainer_send';
         message.innerHTML = msg.message;
+        message.id = msg.messageId;
+
+        if(msg.seen === true) {
+            message.style.backgroundColor = 'rgb(153, 214, 255)';
+        }
 
         let msgTime = document.createElement('span');
         msgTime.className = 'msg_time_send text-right';
@@ -158,6 +170,11 @@ export class DirectMessageComponent implements OnInit {
     }
 
     addReceiverMessage(message: Message): void {
+        if(message.seen === false) {
+            message.seen = true;
+            this.socket.emit("seenMessage", this.chatId, message.messageId);
+        }
+
         let wrapperDiv = document.createElement('div');
         wrapperDiv.className = "d-flex justify-content-start mb-4";
 
@@ -171,6 +188,7 @@ export class DirectMessageComponent implements OnInit {
         let messageDiv = document.createElement('div');
         messageDiv.className = 'msg_cotainer';
         messageDiv.innerHTML = message.message;
+        messageDiv.id = message.messageId;
                 
         let msgTimeSend = document.createElement('span');
         msgTimeSend.className = 'msg_time';
@@ -219,6 +237,7 @@ export class DirectMessageComponent implements OnInit {
     }
 
     setupSocketConnection(): void {
+        // chat socket
         this.socket = io(SOCKET_ENDPOINT);
 
         this.socket.on('connect', () => {
@@ -226,15 +245,23 @@ export class DirectMessageComponent implements OnInit {
         })
 
         this.socket.on('message-broadcast', (message: Message) => {
+            const messageBody = document.getElementById('msg-container');
+            let notScrolled = false;
+
             if (message !== undefined) {
                 if(message.sender === this.globalService.getCurrentUser()) {
                     this.addSenderMessage(message);
                 } else {
+                    if(messageBody.scrollTop + 200 < messageBody.scrollHeight - messageBody.clientHeight) {
+                        notScrolled = true;
+                    }
+
                     this.addReceiverMessage(message);
                 }
-
-                const messageBody = document.getElementById('msg-container');
-                messageBody.scrollTop = messageBody.scrollHeight - messageBody.clientHeight;
+                
+                if(notScrolled === false) {
+                    messageBody.scrollTop = messageBody.scrollHeight - messageBody.clientHeight;
+                }
             }
         });
 
@@ -247,6 +274,20 @@ export class DirectMessageComponent implements OnInit {
         this.socket.on('stopTyping', () => {
             this.typingUser = '';
         })
+
+        this.socket.on('seen', (messageId: string) => {
+            const message = document.getElementById(messageId);
+            message.style.backgroundColor = 'rgb(153, 214, 255)';
+        })
+
+        // users socket
+        this.userSocket = io(USERS_SOCKET);
+
+        this.userSocket.emit('getOnlineUsers');
+
+        this.userSocket.on('users', (users: string[]) => {
+            this.onlineUsers = users;
+        })
     }
 
     sendMessage(): void { 
@@ -255,6 +296,7 @@ export class DirectMessageComponent implements OnInit {
             return;
         }
 
+        this.message.seen = false;
         this.message.chatId = this.chatId;
         this.message.sender = this.globalService.getCurrentUser();
         

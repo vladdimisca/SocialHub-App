@@ -27,7 +27,9 @@
 					<button type="submit" class="btn btn-primary btn-lg">Sign in</button>
 				</div>
 				<div class="text-center">Don't have an account? <a routerLink="register">Register here</a></div>
+				<p *ngIf="alertMessage !== ''" class="alert">{{ alertMessage }}</p>
 			</form>
+			
 		</div>
 	</div>
 </div>

@@ -3,7 +3,6 @@ import { Router } from '@angular/router';
 
 // services
 import { AuthenticationService } from '../authentication.service';
-import { GlobalService } from 'src/app/utils/global.service';
 
 @Component({
     selector: 'app-register',
@@ -13,9 +12,10 @@ import { GlobalService } from 'src/app/utils/global.service';
 export class RegisterComponent {
     constructor(
         private authenticationService: AuthenticationService,
-        private globalService: GlobalService,
         private router: Router
     ) {}
+    
+    private timeout: any;
 
     // fields
     firstName: string;
@@ -25,10 +25,18 @@ export class RegisterComponent {
     validatePassword: string;
 
     // validators
-    messageToDisplay: string;
+    alertMessage: string = '';
 
     registerUser(): void {
         if(this.password !== this.validatePassword) {
+            this.alertMessage = "Passwords not matching!"
+            
+            clearTimeout(this.timeout);
+
+            this.timeout = setTimeout(() => {
+                this.alertMessage = '';
+            }, 3000)
+
             return;
         }
 
@@ -44,7 +52,15 @@ export class RegisterComponent {
                 this.resetFields(); 
                 this.router.navigate(['/']); 
             },
-            (error) => { console.log(error.error); }
+            (error) => {
+                this.alertMessage = error.error;
+
+                clearTimeout(this.timeout);
+
+                this.timeout = setTimeout(() => {
+                    this.alertMessage = '';
+                }, 3000)
+            }
         );
     }
 

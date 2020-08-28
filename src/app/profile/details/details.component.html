@@ -5,11 +5,22 @@
                     <h2>{{ currentUser.firstName + " " + currentUser.lastName }}</h2>
                     <p><strong>About: </strong> I like mango </p>
                     <h3><strong> Friends: </strong> 249 </h3>
+
                 </div>             
                 <div class="column">
-                    <figure>
+                    <div class="dropdown float-right">
+                        <button class="btn btn-flat btn-flat-icon" style="background-color: rgba(241, 240, 241, 0.952);" type="button" data-toggle="dropdown" aria-expanded="false">
+                         <em class="fa fa-ellipsis-h"></em>
+                        </button>
+                        <div class="dropdown-menu dropdown-scale dropdown-menu-right" role="menu" style="position: absolute; transform: translate3d(-136px, 28px, 0px); top: 0px; left: 0px; will-change: transform;">
+                         <a class="dropdown-item" href="#">Change profile picture</a>
+                         <a class="dropdown-item" href="#">Add a new photo</a>
+                        </div>
+                       </div><!--/ dropdown -->
+                       <figure>
                         <img src="assets\images\download.png" alt="" class="rounded-circle profile-photo">
                     </figure>
+                    
                 </div>
             </div>    
             <hr>     

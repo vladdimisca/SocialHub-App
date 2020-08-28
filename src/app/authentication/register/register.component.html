@@ -55,6 +55,7 @@
 					<button type="submit" class="btn btn-primary btn-lg">Register</button>
 				</div>
 				<div class="text-center">Already have an account? <a routerLink="/">Login here</a></div>
+				<p *ngIf="alertMessage !== ''" class="alert">{{ alertMessage }}</p>
 			</form>
 		</div>
 	</div>

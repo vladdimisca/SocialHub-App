@@ -5,7 +5,10 @@ import { UserDetails } from '../models/user-details.interface';
 
 // services
 import { ChatService } from '../chat.service';
-import { ActivatedRoute, Params, Router } from '@angular/router';
+import { ActivatedRoute, Params} from '@angular/router';
+import * as io from 'socket.io-client';
+
+const SOCKET_ENDPOINT = 'localhost:3000/user-status';
 
 @Component({
     selector: 'app-messages',
@@ -13,7 +16,9 @@ import { ActivatedRoute, Params, Router } from '@angular/router';
     styleUrls: ['./messages.component.scss']
 })
 export class MessagesComponent implements OnInit {
+    private socket: io;
     users: UserDetails[] = [];
+    onlineUsers: string[] = [];
     currentUUID: string = '';
 
     @Output()
@@ -25,7 +30,18 @@ export class MessagesComponent implements OnInit {
     ) {}
 
     ngOnInit() {
+        this.setupSocketConnection();
         this.getConnections();
+
+        this.socket.emit('getOnlineUsers');
+    }
+
+    setupSocketConnection(): void {
+        this.socket = io(SOCKET_ENDPOINT);
+
+        this.socket.on('users', (users: string[]) => {
+            this.onlineUsers = users;
+        });
     }
 
     getConnections(): void {
