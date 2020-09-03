@@ -2,9 +2,10 @@
 
     <div class="navbar-nav" id="left">
         <a href="/" class="navbar-brand">Social Hub</a>
-        <form *ngIf="navLinks" class="example">
-            <input type="text" placeholder="Search..." name="search">
-            <button type="submit"><i class="fa fa-search"></i></button>
+        <form *ngIf="navLinks" class="example" >
+            <input type="text" placeholder="Search..." name="search" class="search" (input)="search()" [(ngModel)]="searchString" > 
+            <div><i class="fa fa-search"></i></div>
+            
         </form>
     </div>
 
@@ -14,7 +15,7 @@
 
     <div *ngIf="navLinks" class="collapse navbar-collapse" id="navbarCollapse">
         <div class="navbar-nav ml-auto">
-            <a href="#" class="nav-item nav-link">
+            <a href="/home" class="nav-item nav-link">
                 <i class='fas fa-home' style='font-size:20px'></i>
             </a>
             <a [href]='userProfileLink'  class="nav-item nav-link">
@@ -29,7 +30,7 @@
             <a href="#" class="nav-item nav-link">
                 <i class='fas fa-bell' style='font-size:20px'></i>
             </a>
-            <a href="#" class="nav-item nav-link">
+            <a href='/' (click)="logout()" class="nav-item nav-link">
                 <i class='fas fa-sign-out-alt' style='font-size:20px'></i>
             </a>
         </div>

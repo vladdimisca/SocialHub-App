@@ -16,4 +16,8 @@ export class GlobalService {
     getCurrentUser(): string {
         return this.cookieService.get('currentUser');
     }
+
+    removeCurrentUser(): void {
+        this.cookieService.delete('currentUser');
+    }
 }

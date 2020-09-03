@@ -16,8 +16,7 @@
                 <div class="d-flex bd-highlight">
                     <div class="img_cont">
                         <img src="https://static.turbosquid.com/Preview/001292/481/WV/_D.jpg" class="rounded-circle user_img">
-                        <span *ngIf="onlineUsers.indexOf(user.email) !== -1" class="online_icon"></span>
-                        <span *ngIf="onlineUsers.indexOf(user.email) === -1" class="online_icon offline"></span>
+                        <span [ngClass]="{'offline': onlineUsers.indexOf(user.email) === -1}" class="online_icon"></span>
                     </div>
                     <div class="user_info">
                         <span>{{ user.firstName + ' ' + user.lastName }}</span>

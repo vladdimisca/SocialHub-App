@@ -54,7 +54,7 @@ input {
 * {
     box-sizing: border-box;
   }
-  
+
   /* Style the search field */
   form.example input[type=text] {
     padding: 4px;
@@ -65,9 +65,14 @@ input {
     width: 80%;
     background: #f1f1f1;
   }
-  
+
+.search:focus{
+    box-shadow:none !important;
+    outline:0px !important;
+}
+
   /* Style the submit button */
-  form.example button {
+  form.example div {
     float: left;
     width: 20%;
     padding: 4px;
@@ -77,12 +82,7 @@ input {
     font-size: 17px;
     border: 1px solid  rgb(124, 3, 110);
     border-left: none; /* Prevent double borders */
-    cursor: pointer;
-  }
-  
-  form.example button:hover {
-    background: rgb(22, 1, 20);
-    border: 1px solid  rgb(22, 1, 20);
+    text-align: center;
   }
   
   /* Clear floats */

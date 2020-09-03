@@ -12,8 +12,8 @@ export class ChatService {
         return this.httpClient.get('http://localhost:3000/api/chat?chatId=' + chatId);
     }
 
-    getUsers(): Observable<any> {
-        return this.httpClient.get('http://localhost:3000/api/users');
+    getConnectionsByEmail(email: string): Observable<any> {
+        return this.httpClient.get('http://localhost:3000/api/connections?email=' + email);
     }
 
     getUUID(email: string): Observable<any> {

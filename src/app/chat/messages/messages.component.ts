@@ -4,6 +4,7 @@ import { Component, OnInit, Output, EventEmitter } from '@angular/core';
 import { UserDetails } from '../models/user-details.interface';
 
 // services
+import { GlobalService } from '../../utils/global.service';
 import { ChatService } from '../chat.service';
 import { ActivatedRoute, Params} from '@angular/router';
 import * as io from 'socket.io-client';
@@ -26,7 +27,8 @@ export class MessagesComponent implements OnInit {
 
     constructor(
         private route: ActivatedRoute,
-        private chatService: ChatService
+        private chatService: ChatService,
+        private globalService: GlobalService
     ) {}
 
     ngOnInit() {
@@ -45,7 +47,7 @@ export class MessagesComponent implements OnInit {
     }
 
     getConnections(): void {
-        this.chatService.getUsers().subscribe((users: UserDetails[]) => {
+        this.chatService.getConnectionsByEmail(this.globalService.getCurrentUser()).subscribe((users: UserDetails[]) => {
            this.users = users;
            
            this.users.forEach(user => {
