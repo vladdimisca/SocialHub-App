@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewEncapsulation, Input } from '@angular/core';
+import { Component, OnInit, ViewEncapsulation, Input, Output, EventEmitter } from '@angular/core';
 import * as io from 'socket.io-client';
 
 // interfaces
@@ -7,12 +7,11 @@ import { Message } from '../models/message.interface';
 // services
 import { GlobalService } from '../../utils/global.service';
 import { ChatService } from '../chat.service';
-import { ActivatedRoute, Params, Router } from '@angular/router';
+import { ActivatedRoute, Params } from '@angular/router';
 import { UserDetails } from '../models/user-details.interface';
-import { Subscription } from 'rxjs';
 
-const SOCKET_ENDPOINT = 'localhost:3000/chat';
-const USERS_SOCKET = 'localhost:3000/user-status';
+const CHAT_SOCKET_ENDPOINT = 'localhost:3000/chat';
+const USERS_SOCKET_ENDPOINT = 'localhost:3000/user-status';
 
 @Component({
     selector: 'app-direct-message',
@@ -21,8 +20,9 @@ const USERS_SOCKET = 'localhost:3000/user-status';
     encapsulation: ViewEncapsulation.None
 })
 export class DirectMessageComponent implements OnInit { 
-    private socket: io;
-    private userSocket: io;
+    private chatSocket: io = undefined;
+    private userSocket: io = undefined;
+    conversation: string;
     messageText: string = '';
     chatId: string = '';
     typing: boolean = false;
@@ -30,22 +30,17 @@ export class DirectMessageComponent implements OnInit {
     typingUser: string = '';
     onlineUsers: string[] = [];
 
-    subsParams: Subscription;
-    subsParams1: Subscription;
-    subsChatUUID: Subscription;
-    subsUser: Subscription;
-    subsEmail: Subscription;
-    subsMessages: Subscription;
+    @Output()
+    messagesChange: EventEmitter<any> = new EventEmitter();
 
     receiver: UserDetails = {
         uuid: '',
         firstName: '',
         lastName: '',
-        email: ''
+        fullName: undefined,
+        email: '',
+        pictureURL: ''
     }
-
-    @Input()
-    receiverUUID: string;
 
     private message: Message = {
         messageId: undefined,
@@ -59,73 +54,65 @@ export class DirectMessageComponent implements OnInit {
     
     constructor(
         private route: ActivatedRoute,
-        private router: Router,
         private globalService: GlobalService,
         private chatService: ChatService
     ) {}
-    
-    ngOnChanges() {
-        if(this.receiverUUID !== '') {
-            let container = document.getElementById('msg-container');
-
-            // clear the messages' container
-            while (container.firstChild) {
-                container.removeChild(container.firstChild);
-            }
-
-            // close the sockets
-            this.socket.close();
-            this.userSocket.close();
-            
-            // these are always !== undefined
-            this.subsUser.unsubscribe();
-            this.subsParams.unsubscribe();
-            this.subsMessages.unsubscribe();
-            this.subsChatUUID.unsubscribe();
-
-            if(this.subsEmail !== undefined) {
-                this.subsEmail.unsubscribe();
-            }
-            
-            if(this.subsParams1 !== undefined) {
-                this.subsParams1.unsubscribe();
-            }
-
-            this.router.navigate(['chat/' + this.receiverUUID]).then(() => {
-                this.setup();
-            });
-        } 
-    }
 
     ngOnInit() {
-        this.setup();
+        this.setup(); 
     }   
 
     setup(): void {
-        this.subsParams = this.route.params.subscribe((data: Params) => {
-            this.subsUser = this.chatService.getUserByUUID(data.conversation).subscribe((user: any) => {          
-                this.receiver.firstName = user?.firstName;
-                this.receiver.lastName = user?.lastName;
-                this.receiver.email = user?.email;
-            })
+        this.route.params.subscribe((data: Params) => {
+            if(this.chatSocket !== undefined) {
+                this.chatSocket.close();
+            }
 
-            this.subsChatUUID = this.chatService.getUUID(this.globalService.getCurrentUser()).subscribe((success: any) => {
-                this.chatId = success.uuid > data.conversation ?
-                                data.conversation + '_' + success.uuid : 
-                                success.uuid + '_' + data.conversation;
+            if(this.userSocket !== undefined) {
+                this.userSocket.close();
+            }
 
-                this.getMessages();   
-                this.setupSocketConnection();
-            });
-        }) 
+            this.conversation = data.conversation;
+            
+            if(this.conversation !== 'inbox') {
+                let container = document.getElementById('msg-container');
+
+                // clear the messages' container
+                while (container.firstChild) {
+                    container.removeChild(container.firstChild);
+                }
+
+                this.chatService.getUserByUUID(data.conversation).subscribe((user: UserDetails) => {          
+                    this.receiver = user;
+
+                    this.chatService.getProfilePicture(this.receiver.email).subscribe((pictureURL: string) => {
+                        if(pictureURL === null) {
+                            this.receiver.pictureURL = "assets/images/blank.jpg";
+                        } else {
+                            this.receiver.pictureURL = pictureURL;
+                        }
+
+                        this.chatService.getUUID(this.globalService.getCurrentUser()).subscribe((success: any) => {
+                            this.chatId = success.uuid > data.conversation ?
+                                            data.conversation + '_' + success.uuid : 
+                                            success.uuid + '_' + data.conversation;
+        
+                            this.getMessages();   
+                            this.setupSocketConnection();
+                        });
+                    });
+                });
+            }
+        });
     }
 
     getMessages(): void {
-        this.subsMessages = this.chatService.getMessages(this.chatId).subscribe((messages: Message[]) => {   
+        this.chatService.getMessages(this.chatId).subscribe((messages: Message[]) => {   
             const messageBody = document.getElementById('msg-container');
+            const email = this.globalService.getCurrentUser();
 
             messages.forEach(message => {
-                if(message.sender === this.globalService.getCurrentUser()) {
+                if(message.sender === email) {
                     this.addSenderMessage(message);
                 } else {
                     this.addReceiverMessage(message);
@@ -137,6 +124,8 @@ export class DirectMessageComponent implements OnInit {
     }
 
     addSenderMessage(msg: Message): void {
+        this.messagesChange.emit(msg.timestamp);
+
         let wrapperDiv = document.createElement('div');
         wrapperDiv.className = 'd-flex justify-content-end mb-4';
 
@@ -172,8 +161,10 @@ export class DirectMessageComponent implements OnInit {
     addReceiverMessage(message: Message): void {
         if(message.seen === false) {
             message.seen = true;
-            this.socket.emit("seenMessage", this.chatId, message.messageId);
+            this.chatSocket.emit("seenMessage", this.chatId, message.messageId, message.sender, message.receiver, message.timestamp);
         }
+
+        this.messagesChange.emit(message.timestamp);
 
         let wrapperDiv = document.createElement('div');
         wrapperDiv.className = "d-flex justify-content-start mb-4";
@@ -182,8 +173,8 @@ export class DirectMessageComponent implements OnInit {
         imageDiv.className = 'img_cont_msg';
 
         let img = document.createElement('img');
-        img.className = 'rounded-circle user_img_msg'
-        img.src = "https://static.turbosquid.com/Preview/001292/481/WV/_D.jpg";
+        img.className = 'rounded-circle user_img_msg';
+        img.src = this.receiver?.pictureURL;
 
         let messageDiv = document.createElement('div');
         messageDiv.className = 'msg_cotainer';
@@ -214,7 +205,7 @@ export class DirectMessageComponent implements OnInit {
 
     stopTyping(): void {
         this.typing = false;
-        this.socket.emit('noLongerTyping', this.chatId);
+        this.chatSocket.emit('noLongerTyping', this.chatId);
     }
 
     userIsTyping(): void {
@@ -222,7 +213,7 @@ export class DirectMessageComponent implements OnInit {
 
         if(this.typing === false) {
             this.typing = true;
-            this.socket.emit('type', this.chatId, this.globalService.getCurrentUser(), this.receiver.email);
+            this.chatSocket.emit('type', this.chatId, this.globalService.getCurrentUser(), this.receiver.email);
 
             this.timeout = setTimeout(() => {
                 this.stopTyping();
@@ -238,13 +229,15 @@ export class DirectMessageComponent implements OnInit {
 
     setupSocketConnection(): void {
         // chat socket
-        this.socket = io(SOCKET_ENDPOINT);
+        this.chatSocket = io(CHAT_SOCKET_ENDPOINT);
 
-        this.socket.on('connect', () => {
-            this.socket.emit('setRoom', this.chatId);
+        this.chatSocket.on('connect', () => {
+            this.chatSocket.emit('setRoom', this.chatId);
         })
 
-        this.socket.on('message-broadcast', (message: Message) => {
+        this.chatSocket.on('message-broadcast', (message: Message) => {
+            this.messagesChange.emit(message.timestamp);
+
             const messageBody = document.getElementById('msg-container');
             let notScrolled = false;
 
@@ -265,56 +258,55 @@ export class DirectMessageComponent implements OnInit {
             }
         });
 
-        this.socket.on('typing', (receiverEmail: string, firstName: string) => {
+        this.chatSocket.on('typing', (receiverEmail: string, firstName: string) => {
             if(receiverEmail === this.globalService.getCurrentUser()) {
                 this.typingUser = firstName;
             }  
         });
         
-        this.socket.on('stopTyping', () => {
+        this.chatSocket.on('stopTyping', () => {
             this.typingUser = '';
-        })
+        });
 
-        this.socket.on('seen', (messageId: string) => {
+        this.chatSocket.on('seen', (messageId: string) => {
             const message = document.getElementById(messageId);
             message.style.backgroundColor = 'rgb(153, 214, 255)';
-        })
+        });
 
         // users socket
-        this.userSocket = io(USERS_SOCKET);
+        this.userSocket = io(USERS_SOCKET_ENDPOINT);
 
         this.userSocket.emit('getOnlineUsers');
 
         this.userSocket.on('users', (users: string[]) => {
             this.onlineUsers = users;
-        })
+        });
     }
 
-    sendMessage(): void { 
+    sendMessage(event: any): void { 
         if(!this.messageText.replace(/\s/g, '').length) {
             this.messageText = '';
             return;
         }
 
+        if(event instanceof KeyboardEvent) {
+            this.messageText = this.messageText.slice(0, -1);
+        }
+
         this.message.seen = false;
         this.message.chatId = this.chatId;
         this.message.sender = this.globalService.getCurrentUser();
+        this.message.receiver = this.receiver.email;
+        this.message.message = this.messageText;
         
-        this.subsParams1 = this.route.params.subscribe((data: Params) => {
-            this.subsEmail = this.chatService.getEmailByUUID(data.conversation).subscribe((success: any) => {
-                this.message.receiver = success.email;
-                this.message.message = this.messageText;
-        
-                const date = new Date();
-                this.message.timestamp = date.getTime();
-            
-                this.socket.emit('message', this.message);
+        const date = new Date();
+        this.message.timestamp = date.getTime();
+                
+        this.chatSocket.emit('message', this.message);
 
-                const messageBody = document.getElementById('msg-container');
-                messageBody.scrollTop = messageBody.scrollHeight - messageBody.clientHeight;
+        const messageBody = document.getElementById('msg-container');
+        messageBody.scrollTop = messageBody.scrollHeight - messageBody.clientHeight;
 
-                this.messageText = '';
-            });
-        })
+        this.messageText = '';
     }
 }

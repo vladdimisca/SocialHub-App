@@ -1,29 +1,77 @@
-    
-        <div class="profile">
-            <div class="row">
-                <div class="column">
-                    <h2>{{ currentUser.firstName + " " + currentUser.lastName }}</h2>
-                    <p><strong>About: </strong> I like mango </p>
-                    <h3><strong> Friends: </strong> 249 </h3>
+     <div class="profile">
+        <div class="row">
+            <div class="column">
+                <h2>{{ displayedUser.firstName + " " + displayedUser.lastName }}</h2>
+                <p><strong>About: </strong> I like mango </p>
+                <h3><strong> Friends: </strong> 249 </h3>
+                <h3><strong> Posts: </strong> {{ numberOfPosts }}</h3>
 
-                </div>             
-                <div class="column">     
-                    <figure>
-                        <img src="assets\images\download.png" alt="" class="rounded-circle profile-photo">
-                    </figure>
-                    <label for="files" class="btn btn-success btn-block">Change profile picture</label>
-                    <input id="files" type="file" accept="image/*" style="visibility:hidden"> 
-                </div>
-            </div>    
-            <hr>     
-            <div class="row">
-                <div class="col-xs-12 col-sm-6 emphasis">
-                    <button class="btn btn-success btn-block"><span class="fa fa-plus-circle"></span> Add friend </button>
-                </div>
-                <div class="col-xs-12 col-sm-6 emphasis">
-                    <button class="btn btn-info btn-block"><span class="fa fa-envelope"></span> Message </button>
+            </div> 
+
+            <div class="column">     
+                <div class="picture-container" [ngStyle]="{'cursor': displayedUser.email === currentUser ? 'pointer' : 'context-menu'}">
+                    <div class="picture">
+                        <label for="wizard-picture">
+                            <img [src]='imageSrc' 
+                                alt="profile photo"
+                                class="rounded-circle profile-photo" 
+                                id="wizardPicturePreview" 
+                                [ngStyle]="{'cursor': displayedUser.email === currentUser ? 'pointer' : 'context-menu'}">
+                        </label>
+                        <input *ngIf="displayedUser.email === currentUser" type="file" id="wizard-picture" accept="image/*" (change)="setProfilePicture($event)" hidden>
+                    </div>            
+                </div> 
+
+                <br>
+
+                <div *ngIf="displayedUser.email === currentUser" class="row">
+                    <label class="add" (click)="addNewPicture()" >Add a new photo</label>
                 </div>
             </div>
-        </div>
+        </div> 
+
+        <hr>
+
+        <div *ngIf="displayedUser.email !== currentUser" class="row">
+            <div *ngIf="friendshipStatus !== 'received-request'" class='col-xs-12 col-sm-6 emphasis'>
+                <button *ngIf="friendshipStatus === 'none'" class="btn btn-success btn-block" (click)="addFriend()">
+                    <span class="fa fa-plus-circle"></span> Add friend 
+                </button>
+                <button *ngIf="friendshipStatus === 'friends'" class="btn btn-success btn-block" (click)="removeFriend()">
+                    <span class="fa fa-minus-circle"></span> Remove friend 
+                </button>
+                <button *ngIf="friendshipStatus === 'sent-request'" class="btn btn-success btn-block" (click)="unsendRequest()">
+                    <span class="fa fa-minus-circle"></span> Unsend request 
+                </button>
+            </div>
+
+            <div *ngIf="friendshipStatus === 'received-request'" class="col-xs-12 col-sm-3 emphasis">
+                <button class="btn btn-success btn-block" (click)="acceptRequest()">
+                    <span class="fa fa-plus-circle"></span> Accept
+                </button>
+            </div>
+
+            <div *ngIf="friendshipStatus === 'received-request'" class="col-xs-12 col-sm-3 emphasis">
+                <button  class="btn btn-danger btn-block" (click)="rejectRequest()">
+                    <span class="fa fa-minus-circle"></span> Reject 
+                </button>
+            </div>
             
+            <div class="col-xs-12 col-sm-6 emphasis">
+                <button class="btn btn-info btn-block" (click)="startConversation()"><span class="fa fa-envelope"></span> Message </button>
+            </div>
+        </div>
+
+        <div *ngIf="displayedUser.email === currentUser" class="row">
+            <div class="col-xs-12 col-sm-6 emphasis">
+                <button class="btn btn-success btn-block"><span class="fa fa-user-friends"></span> Friend requests </button>
+            </div>
+            <div class="col-xs-12 col-sm-6 emphasis">
+                <button class="btn btn-info btn-block"><span class="fa fa-cog"></span> Settings </button>
+            </div>
+        </div>
+    </div>
+            
+	
+
 	

@@ -4,6 +4,7 @@ import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
+import { AutocompleteLibModule } from 'angular-ng-autocomplete';
 
 // components
 import { NavbarComponent } from './navbar.component';
@@ -19,7 +20,8 @@ import { NavbarService } from '../navbar/navbar.service';
     imports: [
         CommonModule,
         RouterModule,
-        FormsModule
+        FormsModule,
+        AutocompleteLibModule
     ],
     exports: [NavbarComponent],
     providers: [GlobalService, NavbarService],

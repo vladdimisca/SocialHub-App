@@ -46,7 +46,7 @@ export class LoginComponent implements OnInit {
                 this.socket.emit('online', user.email);
 
                 this.resetFields();
-                this.router.navigate(['/profile/' + user.email]);
+                this.router.navigate(['/home']);
             }, 
             (error) => {
                 this.alertMessage = error.error.error;

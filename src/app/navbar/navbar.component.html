@@ -1,12 +1,35 @@
 <nav class="navbar navbar-expand-md nav-class fixed-top">
 
     <div class="navbar-nav" id="left">
-        <a href="/" class="navbar-brand">Social Hub</a>
-        <form *ngIf="navLinks" class="example" >
-            <input type="text" placeholder="Search..." name="search" class="search" (input)="search()" [(ngModel)]="searchString" > 
-            <div><i class="fa fa-search"></i></div>
-            
-        </form>
+        <a *ngIf="existingUser === true" href="/home" class="navbar-brand">Social Hub</a>
+        <a *ngIf="existingUser === false" href="/" class="navbar-brand">Social Hub</a>
+        
+        <div *ngIf="navLinks" class="example">
+            <div class="input-flex-container">
+                <ng-autocomplete
+                    [data]="users"
+                    [searchKeyword]="searchKeyword"
+                    [itemTemplate]="itemTemplate"
+                    [notFoundTemplate]="notFoundTemplate"
+                    [placeHolder]="placeholder" 
+                    (selected)="openProfile($event)" >                               
+                </ng-autocomplete>
+
+                <div id="searchButton"><i class="fa fa-search"></i></div>
+            </div>
+
+            <ng-template #itemTemplate let-user>
+                <div class="user">
+                    <img [src]="user.pictureURL" alt="user" class="rounded-circle">
+                    <span [innerHTML]="user.firstName + ' ' + user.lastName"></span>
+                </div>
+            </ng-template>
+                 
+            <ng-template #notFoundTemplate>
+                <div style="text-align: center;" [innerHTML]="notFoundMessage"></div>
+            </ng-template>
+        </div>
+        
     </div>
 
     <button type="button" class="navbar-toggler" data-toggle="collapse" data-target="#navbarCollapse">
@@ -36,3 +59,4 @@
         </div>
     </div>
 </nav>
+

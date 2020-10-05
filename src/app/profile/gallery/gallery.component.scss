@@ -3,12 +3,23 @@
     vertical-align: top;
     width: 250px;
     height: 250px;
+    border: 1px solid rgb(224, 222, 213);
+    margin-bottom: 2%;
+    box-shadow: 6px 9px 15px rgb(224, 222, 213);
+    transition: 2s;
   }
+
+.frame-square:hover {
+    width: 300px;
+    height: 300px;
+}
+
 .square{
     height: 100%;
     overflow: hidden;
     position: relative;
 }
+
 .square-photo {
     display: block;
     max-width: 100%;
@@ -20,6 +31,7 @@
     bottom: -100%;
     left: -100%;
 }
+
 .gallery-title
 {
     font-size: 36px;

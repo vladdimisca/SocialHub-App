@@ -20,4 +20,8 @@ export class GlobalService {
     removeCurrentUser(): void {
         this.cookieService.delete('currentUser');
     }
+
+    checkExistingUser(): boolean {
+        return this.cookieService.check('currentUser');
+    }
 }

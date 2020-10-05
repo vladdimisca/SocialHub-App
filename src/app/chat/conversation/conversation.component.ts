@@ -6,9 +6,9 @@ import { Component } from '@angular/core';
     styleUrls: ['./conversation.component.scss']
 })
 export class ConversationComponent {
-    uuid: string = '';
+    timestamp: number = 0;
 
-    openConversation(event: string) {
-        this.uuid = event;
+    fetchConversations(timestamp: number) {
+        this.timestamp = timestamp;
     }
 }

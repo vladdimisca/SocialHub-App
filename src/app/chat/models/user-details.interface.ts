@@ -2,5 +2,7 @@ export interface UserDetails {
     uuid: string,
     firstName: string,
     lastName: string,
-    email: string
+    fullName: string,
+    email: string,
+    pictureURL: string
 }

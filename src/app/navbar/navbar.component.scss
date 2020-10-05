@@ -2,7 +2,6 @@
     background-color: rgb(69, 0, 61);
     padding-right: 1%;
     width: 100%;
-    overflow: hidden;
     z-index: 5;
 }
 
@@ -34,18 +33,34 @@
     cursor: pointer;
 }
 
-input {
-    margin-top: 1%;
-    margin-bottom: 1%;
-    width: 50%;
-}
-
 .navbar-brand {
     font-family: 'Nosifer';
     color: whitesmoke;
     padding-top: 1%;
     font-size: 110%;
 }
+
+.user img {
+    height: 30px;
+    width: 30px;
+}
+
+.user span {
+    margin-left: 5px;
+}
+
+.user {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    white-space: nowrap;
+    line-height: 45px;
+    height: 45px;
+    padding: 0 16px;
+    text-align: left;
+    max-width: 100%;
+    box-sizing: border-box;
+  }
 
 #left {
     width: 60%;
@@ -55,28 +70,24 @@ input {
     box-sizing: border-box;
   }
 
-  /* Style the search field */
-  form.example input[type=text] {
-    padding: 4px;
-    padding-right: 10px;
-    font-size: 17px;
-    border: 1px solid grey;
-    float: left;
-    width: 80%;
-    background: #f1f1f1;
-  }
-
-.search:focus{
-    box-shadow:none !important;
-    outline:0px !important;
+div.example {
+    width: 50%;
 }
 
-  /* Style the submit button */
-  form.example div {
+.input-flex-container {
+    width: 65%;
+    display: flex;
+    flex-wrap: nowrap;
+}
+
+/* Style the submit button */
+ #searchButton {
     float: left;
-    width: 20%;
-    padding: 4px;
-    margin-top: 2px;
+    width: 40px;
+    height: 40px;
+    padding-left: 11px;
+    padding-right: 11px;
+    padding-top: 5px;
     background:  rgb(124, 3, 110);
     color: white;
     font-size: 17px;
@@ -92,8 +103,27 @@ input {
     display: table;
   }
 
+@media only screen and (max-width: 1200px) {
+    .flex-container {
+        width: 80%;
+    }
+} 
+
+@media only screen and (max-width: 900px) {
+    .flex-container {
+        width: 90%;
+    }
+} 
 
 @media only screen and (max-width: 767.98px) {
+    div.example {
+        width: 70%;
+    }
+
+    .flex-container {
+        width: 100%;
+    }
+
     .nav-item.nav-link {
         border-right: none;
     }
@@ -113,8 +143,13 @@ input {
 
 @media only screen and (max-width: 550px) {
     #left {
+        width: 80%;
+    }
+
+    div.example {
         width: 85%;
     }
+
     form.example button {
         margin-top: 4px;
     }
@@ -130,6 +165,11 @@ input {
     #left {
         width: 75%;
     }
+
+    div.example {
+        width: 95%;
+    }
+
     form.example button {
         margin-top: 2px;
     }

@@ -12,4 +12,12 @@ export class NavbarService {
     getUsersByName(searchString: string): Observable<any> {
         return this.httpClient.get('http://localhost:3000/api/usersByName?searchString=' + searchString);
     }
+
+    getAllUsers(): Observable<any> {
+        return this.httpClient.get('http://localhost:3000/api/users');
+    }
+
+    getProfilePicture(email: string): Observable<any> {
+        return this.httpClient.get('http://localhost:3000/api/getProfilePicture?email=' + email);
+    }
 }

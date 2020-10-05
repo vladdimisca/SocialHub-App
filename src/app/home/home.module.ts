@@ -10,7 +10,7 @@ import {HomeComponent} from './home.component';
 
 // services
 import { GlobalService } from '../utils/global.service';
-import { NavbarComponent } from '../navbar/navbar.component';
+import { HomeService } from './home.service';
 
 @NgModule({
   declarations: [
@@ -23,7 +23,7 @@ import { NavbarComponent } from '../navbar/navbar.component';
     HomeRoutingModule
   ],
   exports: [],
-  providers: [GlobalService],
+  providers: [GlobalService, HomeService],
   bootstrap: []
 })
 export class HomeModule { }

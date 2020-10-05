@@ -1,6 +1,6 @@
 
 .hero {
-    padding-top: 6.25rem !important;
+    padding-top: 7rem !important;
     margin: 0px !important;
   }
   .cardbox {
@@ -470,13 +470,125 @@
         margin: 0;
         background-color: #f6f7f8;
         border-top-color: #e9eaed;
-    }     
-    
-.remove-href-style {
-    text-decoration: none;
+    }                                                            
+
+.activeButton {
+    box-shadow:inset 0px 1px 0px 0px #ffffff;
+	background:linear-gradient(to bottom, #fcfbfb 5%, #ffffff 100%);
+    background-color:#f6f6f6;
     color: black;
+	border-top-left-radius:6px;
+	border-top-right-radius:6px;
+    border-top:1px solid #dcdcdc;
+	border-right:1px solid #dcdcdc;
+    border-left:1px solid #dcdcdc;
+    border-bottom: 1px solid white;
+	display:inline-block;
+	cursor:pointer;
+	font-family:Arial;
+	font-size:15px;
+	font-weight:bold;
+	padding:6px 24px;
+	text-decoration:none;
+	text-shadow:0px 1px 0px #ffffff;
 }
 
-.remove-href-style:hover {
-  color: black;
+.nonActiveButton {
+    box-shadow:inset 0px 1px 0px 0px #ffffff;
+    background:linear-gradient(to bottom, #ffffff 5%, #f6f6f6 100%);
+	background-color:#ffffff;
+    color: black;
+    border-radius:6px;   
+    border:1px solid #dcdcdc;
+	display:inline-block;
+	cursor:pointer;
+	font-family:Arial;
+	font-size:15px;
+	font-weight:bold;
+	padding:6px 24px;
+	text-decoration:none;
+	text-shadow:0px 1px 0px #ffffff;
+        
+}
+
+
+.people-nearby .google-maps{
+    background: #f8f8f8;
+    border-radius: 4px;
+    border: 1px solid #f1f2f2;
+    padding: 20px;
+    margin-bottom: 20px;
+  }
+  
+  .people-nearby .google-maps .map{
+    height: 300px;
+    width: 100%;
+    border: none;
+  }
+  
+  .people-nearby .nearby-user{
+    padding: 20px 0;
+    border-top: 1px solid #f1f2f2;
+    border-bottom: 1px solid #f1f2f2;
+    margin-bottom: 20px;
+  }
+  
+  img.profile-photo-lg{
+    height: 80px;
+    width: 80px;
+    border-radius: 50%;
+  }
+
+  .col1 {
+    width: 20%;
+    padding-left: 15px;
+    padding-right: 15px;
+  }
+
+  .col2 {
+    width: 45%;
+  }
+
+  .col3{
+    display: inline;
+  }
+
+  .nearby-user {
+    padding:25px;
+  }
+  @media only screen and (max-width: 495px) {
+    .col1{
+      width: 40%;
+      margin-left: 0%;
+    }
+    .col2 {
+      width: 60%;
+    }
+    .col3 {
+      margin-top: 10px;
+      margin-bottom: 10px;
+      text-align: center;
+      margin: auto;
+    }
+    .row{
+      width: 90%;  
+      align-self: center;
+      margin: auto;
+    }
+    .nearby-user{
+      padding: 0px;
+    }
+}
+
+@media only screen and (max-width: 365px) {
+  .row{
+    width: 99%;
+  }
+  .col1 {
+    width: 40%;
+    margin-left: 0%;
+  }
+  .col2{
+    width: 60%;
+  }
 }

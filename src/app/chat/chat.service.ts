@@ -27,4 +27,16 @@ export class ChatService {
     getUserByUUID(uuid: string): Observable<any> {
         return this.httpClient.get('http://localhost:3000/api/user?uuid=' + uuid)
     }
+
+    getProfilePicture(email: string): Observable<any> {
+        return this.httpClient.get('http://localhost:3000/api/getProfilePicture?email=' + email);
+    }
+
+    checkUnseenMessages(sender: string, receiver: string): Observable<any> {
+        return this.httpClient.get('http://localhost:3000/api/checkUnseenMessages?sender=' + sender + '&receiver=' + receiver);
+    }
+
+    getAllUsers(): Observable<any> {
+        return this.httpClient.get('http://localhost:3000/api/users');
+    }
 }

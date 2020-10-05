@@ -7,7 +7,6 @@ import { User } from './models/user.interface';
 import { GlobalService } from '../utils/global.service';
 import { NavbarService } from '../navbar/navbar.service';
 import { Router } from '@angular/router';
-import { Subscription } from 'rxjs';
 
 @Component({
     selector: 'app-navbar',
@@ -18,9 +17,15 @@ export class NavbarComponent implements OnInit {
     @Input() 
     navLinks: boolean = false;
     
-    subscribeUsers: Subscription;
     userProfileLink: string;
+    existingUser: boolean;
     searchString: string = '';
+
+    // autocomplete
+    users: User[] = [];
+    searchKeyword: string = 'fullName';
+    placeholder: string = 'Search...';
+    notFoundMessage: string = 'No results...';
 
     constructor(
         private globalService: GlobalService,
@@ -29,20 +34,38 @@ export class NavbarComponent implements OnInit {
     ) {}
 
     ngOnInit() {
-        this.userProfileLink = 'profile/' + this.globalService.getCurrentUser();
+        this.existingUser = this.globalService.checkExistingUser();
+
+        if(this.existingUser === true) {
+            this.userProfileLink = 'profile/' + this.globalService.getCurrentUser();
+
+            this.navbarService.getAllUsers().subscribe((users: User[]) => {
+                this.users = users;
+
+                this.users.forEach(user => {
+                    user.fullName = user.firstName + ' ' + user.lastName;
+
+                    this.navbarService.getProfilePicture(user.email).subscribe((pictureURL: string) => {
+                        if(pictureURL === null) {
+                            user.pictureURL = "assets/images/blank.jpg";
+                        } else {
+                            user.pictureURL = pictureURL;
+                        }
+                    });
+                });
+            });
+        }
     }
 
     logout(): void {
         this.globalService.removeCurrentUser();
     }
 
-    search(): void {
-        if(this.subscribeUsers !== undefined) {
-            this.subscribeUsers.unsubscribe();
-        }
+    changeInput(value: string) {
+        this.searchString = value;
+    }
 
-        this.subscribeUsers = this.navbarService.getUsersByName(this.searchString).subscribe((users: User[]) => {
-            console.log(users);
-        });
+    openProfile(user: User): void {
+        this.router.navigateByUrl('profile/' + user.email);
     }
 }
