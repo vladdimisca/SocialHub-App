@@ -72,8 +72,12 @@ export class DetailsComponent implements OnInit {
                     }
                 });
 
-                this.profileService.getDescription(this.currentUser).subscribe((description: string) => {
-                    this.description = description;
+                this.profileService.getDescription(this.displayedUser.email).subscribe((description: string) => {
+                    if(description === '') {
+                        this.description = '-';
+                    } else {
+                        this.description = description;
+                    }
                 })
             });
         });      
