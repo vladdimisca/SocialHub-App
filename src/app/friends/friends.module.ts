@@ -8,13 +8,15 @@ import { NavbarModule } from '../navbar/navbar.module';
 
 // components
 import { FriendRequestsComponent } from './friend-requests/friend-requests.component';
+import { FriendsListComponent } from './friends-list/friends-list.component';
 
 // services
 import { GlobalService } from '../utils/global.service';
 
 @NgModule({
     declarations: [
-        FriendRequestsComponent
+        FriendRequestsComponent,
+        FriendsListComponent
     ],
     imports: [
         CommonModule,

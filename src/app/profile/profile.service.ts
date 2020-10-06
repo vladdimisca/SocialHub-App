@@ -36,4 +36,21 @@ export class ProfileService {
     checkFriendshipStatus(user: string, userToCheck: string): Observable<any> {
         return this.httpClient.get('http://localhost:3000/api/checkFriendshipStatus?user=' + user + '&userToCheck=' + userToCheck);
     }
+
+    getNumberOfFriendsByEmail(email: string): Observable<any> {
+        return this.httpClient.get('http://localhost:3000/api/getNumberOfFriendsByEmail?email=' + email);
+    }
+
+    updateProfile(uuid: string, newFirstName: string, newLastName: string, newDescription: string): Observable<any> {
+        return this.httpClient.put('http://localhost:3000/api/updateProfile', {
+            uuid: uuid, 
+            firstName: newFirstName, 
+            lastName: newLastName,
+            description: newDescription
+        });
+    }
+
+    getDescription(email: string): Observable<any> {
+        return this.httpClient.get('http://localhost:3000/api/getDescription?email=' + email);
+    }
 }
