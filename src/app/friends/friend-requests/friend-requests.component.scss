@@ -1,6 +1,6 @@
 
 .hero {
-    padding-top: 7rem !important;
+    padding-top: 6.3rem !important;
     margin: 0px !important;
   }
   .cardbox {
@@ -540,13 +540,13 @@
   }
 
   .col1 {
-    width: 20%;
+    width: 100px;
     padding-left: 15px;
     padding-right: 15px;
   }
 
   .col2 {
-    width: 45%;
+    width: 40%;
   }
 
   .col3{
@@ -554,19 +554,16 @@
   }
 
   .nearby-user {
-    padding:25px;
+    padding:20px;
+  }
+  .row{
+    margin-top: 15px;
   }
   @media only screen and (max-width: 495px) {
     .col1{
-      width: 40%;
       margin-left: 0%;
     }
-    .col2 {
-      width: 60%;
-    }
     .col3 {
-      margin-top: 10px;
-      margin-bottom: 10px;
       text-align: center;
       margin: auto;
     }
@@ -574,6 +571,8 @@
       width: 90%;  
       align-self: center;
       margin: auto;
+      padding-top: 15px;
+      padding-bottom: 15px;
     }
     .nearby-user{
       padding: 0px;
@@ -581,14 +580,15 @@
 }
 
 @media only screen and (max-width: 365px) {
-  .row{
-    width: 99%;
-  }
+
   .col1 {
-    width: 40%;
     margin-left: 0%;
   }
-  .col2{
-    width: 60%;
+  .row{
+    width: 98%;  
+    align-self: center;
+    margin: auto;
+    padding-top: 15px;
+    padding-bottom: 15px;
   }
 }

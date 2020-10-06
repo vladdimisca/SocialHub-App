@@ -22,6 +22,8 @@ export class DetailsComponent implements OnInit {
     selectedFile: any = undefined;
     currentUser: string = '';
     friendshipStatus: string = 'none';
+    numberOfFriends: number = 0;
+    description: string = '';
 
     @Input()
     numberOfPosts: number = 0;
@@ -53,6 +55,10 @@ export class DetailsComponent implements OnInit {
             this.profileService.getUserByEmail(data.user).subscribe((user: User) => {
                 this.displayedUser = user;
                 
+                this.profileService.getNumberOfFriendsByEmail(this.displayedUser.email).subscribe((numberOfFriends: number) => {
+                    this.numberOfFriends = numberOfFriends;
+                });
+
                 this.profileService.checkFriendshipStatus(this.currentUser, this.displayedUser.email).subscribe((status: string) => {
                     this.friendshipStatus = status;
                 });
@@ -64,6 +70,14 @@ export class DetailsComponent implements OnInit {
                         this.imageSrc = pictureURL;
                     }
                 });
+
+                this.profileService.getDescription(this.displayedUser.email).subscribe((description: string) => {
+                    if(description === '') {
+                        this.description = '-';
+                    } else {
+                        this.description = description;
+                    }
+                })
             });
         });      
     }
@@ -86,10 +100,12 @@ export class DetailsComponent implements OnInit {
 
         this.friendsSocket.on('requestAccepted', () => {
             this.friendshipStatus = 'friends';
+            this.numberOfFriends++;
         });
         
         this.friendsSocket.on('unfriendSent', () => {
             this.friendshipStatus = 'none';
+            this.numberOfFriends--;
         });
 
         this.friendsSocket.on('unfriendReceived', () => {
@@ -157,4 +173,13 @@ export class DetailsComponent implements OnInit {
     rejectRequest(): void {
         this.friendsSocket.emit('unsendFriendRequest', this.displayedUser.email, this.currentUser);
     }
+
+    openSettings(): void {
+        if(this.friendsSocket !== undefined) {
+            this.friendsSocket.close();
+        }
+
+        this.router.navigateByUrl('profile/settings');
+    }
+
 }
