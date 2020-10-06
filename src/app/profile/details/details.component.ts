@@ -7,7 +7,6 @@ import { User } from '../models/user.interface';
 //services
 import { ProfileService } from '../profile.service';
 import { GlobalService } from '../../utils/global.service';
-import { Subscription } from 'rxjs';
 import { ActivatedRoute, Params, Router } from '@angular/router';
 
 const FRIENDS_SOCKET_ENDPOINT = 'localhost:3000/friends';

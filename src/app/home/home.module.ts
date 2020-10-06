@@ -5,8 +5,11 @@ import { HttpClientModule } from '@angular/common/http';
 import { NavbarModule } from '../navbar/navbar.module';
 import { HomeRoutingModule } from './home-routing.module';
 
+// pipes
+import { DateAgoModule } from '../utils/date-ago/date-ago.module';
+
 // components
-import {HomeComponent} from './home.component';
+import { HomeComponent } from './home.component';
 
 // services
 import { GlobalService } from '../utils/global.service';
@@ -20,7 +23,8 @@ import { HomeService } from './home.service';
     CommonModule,
     HttpClientModule,
     NavbarModule,
-    HomeRoutingModule
+    HomeRoutingModule,
+    DateAgoModule
   ],
   exports: [],
   providers: [GlobalService, HomeService],

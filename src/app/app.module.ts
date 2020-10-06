@@ -12,7 +12,7 @@ import { GlobalService } from './utils/global.service';
 
 @NgModule({
   declarations: [
-    AppComponent 
+    AppComponent,
   ],
   imports: [
     CommonModule,

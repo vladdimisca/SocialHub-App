@@ -12,7 +12,7 @@
                 <div class="picture-container" [ngStyle]="{'cursor': displayedUser.email === currentUser ? 'pointer' : 'context-menu'}">
                     <div class="picture">
                         <label for="wizard-picture">
-                            <img [src]='imageSrc' 
+                            <img *ngIf="imageSrc !== undefined" [src]='imageSrc' 
                                 alt="profile photo"
                                 class="rounded-circle profile-photo" 
                                 id="wizardPicturePreview" 

@@ -8,15 +8,15 @@
                     <div class="cardbox-heading">
                         <div class="media m-0">
                             <div class="d-flex mr-3">
-                                <a [href]="'profile/' + post.email"><img class="img-fluid rounded-circle" [src]="post.profilePictureURL" alt="picture"></a>
+                                <a *ngIf="post.profilePictureURL !== undefined" [href]="'profile/' + post.email"><img class="img-fluid rounded-circle" [src]="post.profilePictureURL" alt="picture"></a>
                             </div>
                             <div class="media-body">
-                                <a [href]="'profile/' + post.email" class="remove-href-style">
-                                    <h5 class="m-0">{{ post.firstName + ' ' + post.lastName }}</h5>
+                                <a *ngIf="post.firstName !== undefined" [href]="'profile/' + post.email" class="remove-href-style">
+                                    <h5 class="m-0" >{{ post.firstName + ' ' + post.lastName }}</h5>
                                 </a>
                                 <small>
                                     <span>
-                                        <i class="icon ion-md-time"></i> {{ post.timestamp | date : 'MMM d, y h:mm a' }}
+                                        <i class="icon ion-md-time"></i>  {{ post.timestamp | dateAgo }} 
                                     </span>
                                 </small>
                             </div>

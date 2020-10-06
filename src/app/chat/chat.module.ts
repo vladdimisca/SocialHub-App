@@ -29,7 +29,7 @@ import { ChatService } from '../chat/chat.service';
         FormsModule,
         HttpClientModule,
         ChatRoutingModule,
-        NavbarModule
+        NavbarModule,
     ],
     providers: [GlobalService, ChatService],
     bootstrap: []

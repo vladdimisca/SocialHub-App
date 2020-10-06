@@ -141,16 +141,12 @@ export class DirectMessageComponent implements OnInit {
         let msgTime = document.createElement('span');
         msgTime.className = 'msg_time_send text-right';
         msgTime.style.width = '150px';
-
-        const date = new Date();
-
-        if(date.getTime() - msg.timestamp > 24 * 60 * 60 * 1000) {
-            msgTime.innerHTML = new Date(msg.timestamp).toLocaleDateString('en-GB') + ' '  + 
-                                        new Date(msg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-        } else {
-            msgTime.innerHTML = new Date(msg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-        }
+        msgTime.innerHTML = this.getDateAgo(msg.timestamp);
         
+        setInterval(() => {
+            msgTime.innerHTML = this.getDateAgo(msg.timestamp);
+        }, 5000);
+
         message.appendChild(msgTime);
         wrapperDiv.appendChild(message);
 
@@ -181,20 +177,16 @@ export class DirectMessageComponent implements OnInit {
         messageDiv.innerHTML = message.message;
         messageDiv.id = message.messageId;
                 
-        let msgTimeSend = document.createElement('span');
-        msgTimeSend.className = 'msg_time';
-        msgTimeSend.style.width = '150px';
-
-        const date = new Date();
-
-        if(date.getTime() - message.timestamp > 24 * 60 * 60 * 1000) {
-            msgTimeSend.innerHTML = new Date(message.timestamp).toLocaleDateString('en-GB') + ' ' +
-                                            new Date(message.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-        } else {
-            msgTimeSend.innerHTML = new Date(message.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-        }
+        let msgTimeSent = document.createElement('span');
+        msgTimeSent.className = 'msg_time';
+        msgTimeSent.style.width = '150px';
+        msgTimeSent.innerHTML = this.getDateAgo(message.timestamp);
+        
+        setInterval(() => {
+            msgTimeSent.innerHTML = this.getDateAgo(message.timestamp);
+        }, 5000);
                 
-        messageDiv.appendChild(msgTimeSend);
+        messageDiv.appendChild(msgTimeSent);
         imageDiv.appendChild(img);
         wrapperDiv.appendChild(imageDiv);
         wrapperDiv.appendChild(messageDiv);
@@ -308,5 +300,39 @@ export class DirectMessageComponent implements OnInit {
         messageBody.scrollTop = messageBody.scrollHeight - messageBody.clientHeight;
 
         this.messageText = '';
+    }
+
+    getDateAgo(timestamp: number): string {
+        let result: string;
+        let now = new Date().getTime(); // current time
+        let delta = (now - timestamp) / 1000; // time since message was sent in seconds
+
+        if (delta < 45) {
+            result = 'Just now';
+        } else 
+            if (delta < 60) { // sent in last minute
+            result = Math.floor(delta) + ' seconds ago';
+            } else 
+                if (delta < 3600) { // sent in last hour
+                    if(Math.floor(delta / 60) === 1) {
+                        result = Math.floor(delta / 60) + ' minute ago';
+                    } else {
+                        result = Math.floor(delta / 60) + ' minutes ago';
+                    }
+                } else
+                    if (delta < 86400) { // sent on last day
+                        if(Math.floor(delta / 3600) === 1) {
+                            result = Math.floor(delta / 3600) + ' hour ago';
+                        } else {
+                            result = Math.floor(delta / 3600) + ' hours ago';
+                        }
+                    } else 
+                        if (delta < 3 * 86400) { // sent on last 3 days
+                                result = Math.floor(delta / 86400) + ' days ago';
+                        } else { // sent more than three days ago
+                            result = new Date(timestamp).toLocaleDateString('en-GB') + ' ' +
+                                        new Date(timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                        }
+        return result;
     }
 }

@@ -20,7 +20,7 @@
 
             <ng-template #itemTemplate let-user>
                 <div class="user">
-                    <img [src]="user.pictureURL" alt="user" class="rounded-circle">
+                    <img *ngIf="user.pictureURL !== undefined" [src]="user.pictureURL" alt="user" class="rounded-circle">
                     <span [innerHTML]="user.firstName + ' ' + user.lastName"></span>
                 </div>
             </ng-template>

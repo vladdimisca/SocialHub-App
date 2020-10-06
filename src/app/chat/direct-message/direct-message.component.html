@@ -2,7 +2,7 @@
     <div *ngIf="conversation !== 'inbox'" class="card-header msg_head">
         <div class="d-flex bd-highlight">
             <a [href]="'profile/' + receiver.email">
-                <div class="img_cont">
+                <div *ngIf="receiver.pictureURL !== undefined" class="img_cont">
                     <img [src]="receiver.pictureURL" alt="profile" class="rounded-circle user_img">
                     <span [ngClass]="{'offline': onlineUsers.indexOf(receiver.email) === -1}" class="online_icon"></span>
                 </div>
