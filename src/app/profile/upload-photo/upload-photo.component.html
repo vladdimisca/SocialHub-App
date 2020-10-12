@@ -7,8 +7,8 @@
             <div class="cardbox shadow-lg bg-white">
                 <div class="cardbox-heading">
                     <div class="media m-0">
-                        <div class="d-flex mr-3">
-                            <a href=""><img class="img-fluid rounded-circle" [src]="profilePictureURL" alt="User"></a>
+                        <div *ngIf="profilePictureURL !== undefined" class="d-flex mr-3">
+                            <img class="img-fluid rounded-circle" [src]="profilePictureURL" alt="User">
                         </div>
                     <div class="media-body">
 
@@ -22,26 +22,26 @@
 
             <br>
 
-            <img *ngIf="uploadedImageURL !== ''" class="img-fluid" [src]="uploadedImageURL" alt="Image">
+            <img *ngIf="uploadedImageURL !== undefined" class="img-fluid" [src]="uploadedImageURL" alt="Image">
                 
-            <br *ngIf="uploadedImageURL !== ''">
-            <br *ngIf="uploadedImageURL !== ''">
+            <br *ngIf="uploadedImageURL !== undefined">
+            <br *ngIf="uploadedImageURL !== undefined">
           
             <div class="row">
                 <div class="col-xs-12 col-sm-6 emphasis">
                     <div class="upload-btn-wrapper">
                         <label class="btn btn-success btn-block" for="myFile" >  
                             <span class="fa fa-image"></span> 
-                            <span *ngIf="uploadedImageURL === ''"> Choose a photo</span>
-                            <span *ngIf="uploadedImageURL !== ''"> Change photo</span>
+                            <span *ngIf="uploadedImageURL === undefined"> Choose a photo</span>
+                            <span *ngIf="uploadedImageURL !== undefined"> Change photo</span>
                         </label>  
                         <input type="file" accept="image/*" id="myFile" (change)="uploadPhoto($event)" hidden>
                     </div>
                 </div>
-                <div *ngIf="uploadedImageURL !== ''" class="col-xs-12 col-sm-6 emphasis">
+                <div *ngIf="uploadedImageURL !== undefined" class="col-xs-12 col-sm-6 emphasis">
                         <button class="btn btn-info btn-block" (click)="post()"> <span class="fa fa-share-square"></span> Post </button>
                 </div>
-                <div *ngIf="uploadedImageURL === ''" class="col-xs-12 col-sm-6 emphasis">
+                <div *ngIf="uploadedImageURL === undefined" class="col-xs-12 col-sm-6 emphasis">
                     <button class="btn btn-info btn-block" style="opacity: 40%; cursor: context-menu;" disabled>
                         <span class="fa fa-share-square" ></span> Post 
                     </button>

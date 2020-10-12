@@ -7,6 +7,7 @@
         <div *ngIf="navLinks" class="example">
             <div class="input-flex-container">
                 <ng-autocomplete
+                    [minQueryLength]="'1'"
                     [data]="users"
                     [searchKeyword]="searchKeyword"
                     [itemTemplate]="itemTemplate"
@@ -47,7 +48,7 @@
             <a href="/chat/inbox" class="nav-item nav-link">
                 <i class='fas fa-comments' style='font-size:20px'></i>
             </a>
-            <a href="#" class="nav-item nav-link">
+            <a href="friends/friend-requests" class="nav-item nav-link">
                 <i class='fas fa-users' style='font-size:20px'></i>
             </a>
             <a href="#" class="nav-item nav-link">

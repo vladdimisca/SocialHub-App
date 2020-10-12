@@ -9,7 +9,7 @@ export class ProfileService {
     ) {}
 
     getUserByEmail(email: string): Observable<any> {
-        return this.httpClient.get('http://localhost:3000/api/userByEmail?email=' + email);
+        return this.httpClient.get('http://localhost:3000/api/getUserByEmail?email=' + email);
     }
 
     setProfileImage(email: string, image: any): Observable<any> {
@@ -51,6 +51,6 @@ export class ProfileService {
     }
 
     getDescription(email: string): Observable<any> {
-        return this.httpClient.get('http://localhost:3000/api/getDescription?email=' + email);
+        return this.httpClient.get('http://localhost:3000/api/getDescriptionByEmail?email=' + email);
     }
 }

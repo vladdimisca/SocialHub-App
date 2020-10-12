@@ -41,15 +41,19 @@ export class LoginComponent implements OnInit {
         };
 
         this.authenticationService.login(user).subscribe(
-            (success) => {
+            (token) => {
+                //this.globalService.rememberUser(user.email);
+                this.globalService.setToken(token);
                 this.globalService.setCurrentUser(user.email);
-                this.socket.emit('online', user.email);
+                this.socket.emit('newOnlineUser', user.email);
 
                 this.resetFields();
                 this.router.navigate(['/home']);
             }, 
             (error) => {
-                this.alertMessage = error.error.error;
+                if(error.status === 500) {
+                    this.alertMessage = error.error;
+                }
 
                 clearTimeout(this.timeout);
 

@@ -64,7 +64,7 @@
 
         <div *ngIf="displayedUser.email === currentUser" class="row">
             <div class="col-xs-12 col-sm-6 emphasis">
-                <button class="btn btn-success btn-block"><span class="fa fa-user-friends"></span> Friend requests </button>
+                <button class="btn btn-success btn-block" (click)="openFriendRequests()"><span class="fa fa-user-friends"></span> Friend requests </button>
             </div>
             <div class="col-xs-12 col-sm-6 emphasis">
                 <button class="btn btn-info btn-block" (click)="openSettings()"><span class="fa fa-cog"></span> Settings </button>

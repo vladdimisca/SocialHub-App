@@ -472,43 +472,48 @@ body{margin-top:20px;
       border-top-color: #e9eaed;
   }                                                            
 
+  .profile-link {
+    text-decoration: none;
+    color: black;
+  }
+
 .activeButton {
   box-shadow:inset 0px 1px 0px 0px #ffffff;
-background:linear-gradient(to bottom, #fcfbfb 5%, #ffffff 100%);
+  background:linear-gradient(to bottom, #fcfbfb 5%, #ffffff 100%);
   background-color:#f6f6f6;
   color: black;
-border-top-left-radius:6px;
-border-top-right-radius:6px;
+  border-top-left-radius:6px;
+  border-top-right-radius:6px;
   border-top:1px solid #dcdcdc;
-border-right:1px solid #dcdcdc;
+  border-right:1px solid #dcdcdc;
   border-left:1px solid #dcdcdc;
   border-bottom: 1px solid white;
-display:inline-block;
-cursor:pointer;
-font-family:Arial;
-font-size:15px;
-font-weight:bold;
-padding:6px 24px;
-text-decoration:none;
-text-shadow:0px 1px 0px #ffffff;
+  display:inline-block;
+  cursor:pointer;
+  font-family:Arial;
+  font-size:15px;
+  font-weight:bold;
+  padding:6px 24px;
+  text-decoration:none;
+  text-shadow:0px 1px 0px #ffffff;
 }
 
 .nonActiveButton {
   box-shadow:inset 0px 1px 0px 0px #ffffff;
   background:linear-gradient(to bottom, #ffffff 5%, #f6f6f6 100%);
-background-color:#ffffff;
+  background-color:#ffffff;
   color: black;
   border-radius:6px;   
   border:1px solid #dcdcdc;
-display:inline-block;
-cursor:pointer;
-font-family:Arial;
-font-size:15px;
-font-weight:bold;
-padding:6px 24px;
-text-decoration:none;
-text-shadow:0px 1px 0px #ffffff;
-      
+  display:inline-block;
+  cursor:pointer;
+  font-family:Arial;
+  font-size:15px;
+  font-weight:bold;
+  padding:6px 24px;
+  text-decoration:none;
+  text-shadow:0px 1px 0px #ffffff;
+  outline: none;
 }
 
 
@@ -518,6 +523,10 @@ text-shadow:0px 1px 0px #ffffff;
   border: 1px solid #f1f2f2;
   padding: 20px;
   margin-bottom: 20px;
+}
+
+.centered {
+  text-align: center;
 }
 
 .people-nearby .google-maps .map{

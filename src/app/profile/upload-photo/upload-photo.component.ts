@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 
 // interfaces
-import { User } from '../models/user.interface';
+import { User } from '../../models/user.interface';
 
 // services
 import { GlobalService } from '../../utils/global.service';
@@ -16,14 +16,17 @@ import { ProfileService } from '../profile.service';
 export class UploadPhotoComponent implements OnInit { 
     profilePictureURL: string;
     descriptionText: string = '';
-    uploadedImageURL: any = '';
+    uploadedImageURL: any;
     uploadTimestamp: number;
 
     currentUser: User = {
         uuid: '',
         email: '',
         firstName: '',
-        lastName: ''
+        lastName: '',
+        fullName: undefined,
+        description: undefined,
+        pictureURL: undefined
     }
 
     constructor(

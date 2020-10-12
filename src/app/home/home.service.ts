@@ -9,7 +9,7 @@ export class HomeService {
     ) {}
 
     getUserByEmail(email: string): Observable<any> {
-        return this.httpClient.get('http://localhost:3000/api/userByEmail?email=' + email);
+        return this.httpClient.get('http://localhost:3000/api/getUserByEmail?email=' + email);
     }
 
     getProfileImage(email: string): Observable<any> {

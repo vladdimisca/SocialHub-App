@@ -1,12 +1,15 @@
 import { Component, Input, OnInit } from '@angular/core';
+import * as io from 'socket.io-client';
 
 // models
-import { User } from './models/user.interface';
+import { User } from '../models/user.interface';
 
 // services
 import { GlobalService } from '../utils/global.service';
 import { NavbarService } from '../navbar/navbar.service';
 import { Router } from '@angular/router';
+
+const USERS_SOCKET_ENDPOINT = 'localhost:3000/user-status';
 
 @Component({
     selector: 'app-navbar',
@@ -14,6 +17,8 @@ import { Router } from '@angular/router';
     styleUrls: ['navbar.component.scss']
 })
 export class NavbarComponent implements OnInit { 
+    userSocket: io;
+
     @Input() 
     navLinks: boolean = false;
     
@@ -34,6 +39,7 @@ export class NavbarComponent implements OnInit {
     ) {}
 
     ngOnInit() {
+        this.userSocket = io(USERS_SOCKET_ENDPOINT);
         this.existingUser = this.globalService.checkExistingUser();
 
         if(this.existingUser === true) {
@@ -58,7 +64,11 @@ export class NavbarComponent implements OnInit {
     }
 
     logout(): void {
+        const email = this.globalService.getCurrentUser();
+        this.userSocket.emit('setUserOffline', email);
+        
         this.globalService.removeCurrentUser();
+        this.globalService.removeToken();
     }
 
     changeInput(value: string) {

@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 
 // interfaces
-import { User } from '../models/user.interface';
+import { User } from '../../models/user.interface';
 
 // services
 import { GlobalService } from '../../utils/global.service';
@@ -18,13 +18,21 @@ export class SettingsComponent implements OnInit {
         uuid: '',
         email: '',
         firstName: '',
-        lastName: ''
+        lastName: '',
+        fullName: undefined,
+        pictureURL: undefined,
+        description: undefined
     }
     
     // input fields
     firstName: string = '';
     lastName: string = '';
     description: string = '';
+
+    // check validators
+    profileUpdated: boolean = false;
+    updateError: boolean = false;
+    updateTimeout: any;
 
     constructor ( 
         private globalSevice: GlobalService,
@@ -48,18 +56,51 @@ export class SettingsComponent implements OnInit {
     }
 
     updateProfile(): void {
-        this.profileService.updateProfile(this.currentUser.uuid, this.firstName, this.lastName, this.description)
-        .subscribe((success: any) => {
-            this.currentUser = success.user;
-            this.actualDescription = success.description;
-        },
-        (error: any) => {
-            console.log(error);
+        if(this.firstName.length === 0 || this.lastName.length === 0) {
+            this.updateError = true;
 
-            this.firstName = this.currentUser.firstName;
-            this.lastName = this.currentUser.lastName;
-            this.description = this.actualDescription;
-        });
+            if(this.updateTimeout) {
+                clearTimeout(this.updateTimeout);
+            }
+
+            this.updateTimeout = setTimeout(() => {  
+                this.updateError = false;
+            }, 2000);
+        } else {
+            this.profileService.updateProfile(this.currentUser.uuid, this.firstName, this.lastName, this.description)
+                .subscribe((success: any) => {
+                    this.currentUser = success.user;
+                    this.actualDescription = success.description;
+
+                    this.profileUpdated = true;
+
+                    if(this.updateTimeout) {
+                        clearTimeout(this.updateTimeout);
+                    }
+
+                    this.updateTimeout = setTimeout(() => {  
+                        this.profileUpdated = false;
+                    }, 2000);
+                },
+                (error: any) => {
+                    console.log(error);
+
+                    this.updateError = true;
+
+                    if(this.updateTimeout) {
+                        clearTimeout(this.updateTimeout);
+                    }
+
+                    this.updateTimeout = setTimeout(() => {  
+                        this.updateError = false;
+                    }, 2000);
+
+                    this.firstName = this.currentUser.firstName;
+                    this.lastName = this.currentUser.lastName;
+                    this.description = this.actualDescription;
+                });
+        }
+        
     }
 
 }

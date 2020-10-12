@@ -2,12 +2,13 @@ import { Component, Input, OnInit } from '@angular/core';
 import * as io from 'socket.io-client';
 
 //models
-import { User } from '../models/user.interface';
+import { User } from '../../models/user.interface';
 
 //services
 import { ProfileService } from '../profile.service';
 import { GlobalService } from '../../utils/global.service';
 import { ActivatedRoute, Params, Router } from '@angular/router';
+import { Subscription } from 'rxjs';
 
 const FRIENDS_SOCKET_ENDPOINT = 'localhost:3000/friends';
 
@@ -17,13 +18,16 @@ const FRIENDS_SOCKET_ENDPOINT = 'localhost:3000/friends';
     styleUrls: ['details.component.scss']
 })
 export class DetailsComponent implements OnInit { 
-    friendsSocket: io = undefined;
+    friendsSocket: io;
     imageSrc: string; 
     selectedFile: any = undefined;
     currentUser: string = '';
     friendshipStatus: string = 'none';
     numberOfFriends: number = 0;
     description: string = '';
+
+    // subscriptions
+    paramsSubscription: Subscription;
 
     @Input()
     numberOfPosts: number = 0;
@@ -32,7 +36,10 @@ export class DetailsComponent implements OnInit {
         uuid: '',
         email: '',
         firstName: '',
-        lastName: ''
+        lastName: '',
+        fullName: undefined,
+        description: undefined,
+        pictureURL: undefined
     }
 
     constructor(
@@ -45,7 +52,7 @@ export class DetailsComponent implements OnInit {
     ngOnInit() {
         this.currentUser = this.globalService.getCurrentUser();
 
-        this.route.params.subscribe((data: Params) => {
+        this.paramsSubscription = this.route.params.subscribe((data: Params) => {
             if(this.friendsSocket !== undefined) {
                 this.friendsSocket.close();
             }
@@ -54,9 +61,9 @@ export class DetailsComponent implements OnInit {
 
             this.profileService.getUserByEmail(data.user).subscribe((user: User) => {
                 this.displayedUser = user;
-                
+                    
                 this.profileService.getNumberOfFriendsByEmail(this.displayedUser.email).subscribe((numberOfFriends: number) => {
-                    this.numberOfFriends = numberOfFriends;
+                        this.numberOfFriends = numberOfFriends;
                 });
 
                 this.profileService.checkFriendshipStatus(this.currentUser, this.displayedUser.email).subscribe((status: string) => {
@@ -77,7 +84,7 @@ export class DetailsComponent implements OnInit {
                     } else {
                         this.description = description;
                     }
-                })
+                });
             });
         });      
     }
@@ -179,7 +186,14 @@ export class DetailsComponent implements OnInit {
             this.friendsSocket.close();
         }
 
+        if(this.paramsSubscription !== undefined) {
+            this.paramsSubscription.unsubscribe();
+        }
+
         this.router.navigateByUrl('profile/settings');
     }
 
+    openFriendRequests(): void {
+        this.router.navigateByUrl('friends/friend-requests');
+    }
 }

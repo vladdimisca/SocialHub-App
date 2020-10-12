@@ -2,8 +2,8 @@ import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 
 // interfaces
-import { Post } from './models/post.interface';
-import { User } from './models/user.interface';
+import { Post } from '../models/post.interface';
+import { User } from '../models/user.interface';
 
 // services
 import { GlobalService } from '../utils/global.service';

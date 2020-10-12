@@ -176,6 +176,18 @@ a.list-group-item, .list-group-item-action {
     content: '';
 }
 
+.fa.fa-times {
+  color: red;
+  font-size: larger;
+  margin-left: 10px;
+}
+
+.check-style {
+  color: seagreen;
+  font-size: larger;
+  margin-left: 10px;
+}
+
 .hero {
     padding-top: 6.25rem !important;
     margin: 0px !important;

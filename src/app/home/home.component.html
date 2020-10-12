@@ -1,6 +1,9 @@
 <app-navbar [navLinks]="true"> </app-navbar>
 
 <section class="hero">
+    <div style="text-align: center;" *ngIf="posts.length === 0" class="container">
+            There aren't posts to be displayed. Find more friends to see their posts.
+    </div>
     <div *ngFor="let post of posts" class="container">
         <div class="row">	
             <div class="col-lg-6 offset-lg-3">
@@ -31,7 +34,7 @@
                         </div>
                         <img class="img-fluid" [src]="post.pictureURL" alt="Image">
                     </div>
-    <!--
+    
                     <div class="cardbox-base">
                         <ul class="float-right">
                             <li><a><i class="fa fa-comments" ></i></a></li>
@@ -42,7 +45,7 @@
                             <li><a><span>242 Likes</span></a></li>
                         </ul>			   
                     </div>
-        
+        <!--
                     <div class="social-footer">
                         <div class="social-comment">
                             <span class="comment-avatar float-left" style="margin-top: 10px;">
@@ -77,7 +80,7 @@
                         </div>
                     </div>
                 </div>
-
+            -->
         <div class="social-footer">
            <div class="social-comment" style="display: flex;">
                <span class="comment-avatar float-left" style="margin-top: 10px;">
@@ -88,8 +91,7 @@
                </div>
                <button class="btn" style="background-color: rgb(69, 0, 61); color:white; border-color:rgb(69, 0, 61); margin-top: 10px; margin-bottom: 10px;"> Post</button>
            </div>
-       </div>		  
-        -->       
+       </div>		       
        </div>
     
       </div>				

@@ -5,10 +5,21 @@ import { Routes, RouterModule } from '@angular/router';
 import { LoginComponent } from './login/login.component';
 import { RegisterComponent } from './register/register.component';
 
+// guards
+import { LoggedGuard } from '../utils/guards/logged.guard';
 
 const routes: Routes = [
-  {path: '', component: LoginComponent},
-  {path: 'register', component: RegisterComponent, data: {title: 'Register'} }
+  {
+    path: '', 
+    component: LoginComponent,
+    canActivate: [LoggedGuard]
+  },
+  {
+    path: 'register', 
+    component: RegisterComponent,
+    canActivate: [LoggedGuard], 
+    data: {title: 'Register'} 
+  }
 ];
 
 @NgModule({

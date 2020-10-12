@@ -1,9 +1,14 @@
 <div class="mygallery">
     <div *ngFor="let post of posts" class="frame-square">
-        <div class="square">
-            <a href="assets\images\blank.jpg" data-size="1600x1067">
-                <img [src]="post.pictureURL" class="img-responsive square-photo">
-            </a> 
+        <div (click)="startOverlay(post)" class="square">
+                <img [src]="post.pictureURL" class="img-responsive square-photo"> 
          </div>
     </div>  
+    <div *ngIf="overlay === true" id="overlay" (click)="stopOverlay()">
+        <div class="row absolute">
+            <div class="big-frame-square">
+                <img [src]="displayedPost.pictureURL" class="img-responsive square-photo">
+            </div>
+        </div>
+    </div>
  </div>

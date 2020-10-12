@@ -2,7 +2,7 @@
     background-color: rgb(69, 0, 61);
     padding-right: 1%;
     width: 100%;
-    z-index: 5;
+    z-index: 99999;
 }
 
 .fa.fa-bars {
@@ -109,19 +109,23 @@ div.example {
     }
 } 
 
-@media only screen and (max-width: 900px) {
+@media only screen and (max-width: 1000px) {
     .flex-container {
         width: 90%;
+    }
+
+    div.example {
+        width: 70%;
     }
 } 
 
 @media only screen and (max-width: 767.98px) {
     div.example {
-        width: 70%;
+        width: 80%;
     }
 
-    .flex-container {
-        width: 100%;
+    .input-flex-container {
+        width: 80%;
     }
 
     .nav-item.nav-link {
@@ -141,33 +145,35 @@ div.example {
     }
 }
 
-@media only screen and (max-width: 550px) {
+@media only screen and (max-width: 650px) {
     #left {
         width: 80%;
     }
+}
 
+@media only screen and (max-width: 550px) {
     div.example {
-        width: 85%;
+        width: 90%;
     }
 
     form.example button {
         margin-top: 4px;
     }
 }
+
 @media only screen and (max-width: 640px) {
-    
     form.example button {
         margin-top: 3px;
     }
 }
 
-@media only screen and (max-width: 400px) {
-    #left {
-        width: 75%;
+@media only screen and (max-width: 450px) {
+    .input-flex-container {
+        width: 100%;
     }
 
     div.example {
-        width: 95%;
+        width: 90%;
     }
 
     form.example button {

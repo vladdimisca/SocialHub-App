@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 
 // interfaces
-import { Post } from '../models/post.interface';
+import { Post } from '../../models/post.interface';
 
 // services
 import { ProfileService } from '../profile.service';

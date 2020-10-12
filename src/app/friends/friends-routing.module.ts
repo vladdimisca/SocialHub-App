@@ -5,9 +5,22 @@ import { Routes, RouterModule } from '@angular/router';
 import { FriendRequestsComponent } from './friend-requests/friend-requests.component';
 import { FriendsListComponent } from './friends-list/friends-list.component';
 
+// guards
+import { AuthGuard } from '../utils/guards/auth.guard';
+
 const routes: Routes = [
-    {path: 'friend-requests', component: FriendRequestsComponent, data: {title: 'Friend Requests'}},
-    {path: 'friends-list', component: FriendsListComponent, data: {title: 'Friends List'}}
+    {
+      path: 'friend-requests', 
+      component: FriendRequestsComponent, 
+      canActivate: [AuthGuard],
+      data: {title: 'Friend Requests'}
+    },
+    {
+      path: 'friends-list', 
+      component: FriendsListComponent, 
+      canActivate: [AuthGuard],
+      data: {title: 'Friends List'}
+    }
 ];
 
 @NgModule({

@@ -1,14 +1,14 @@
-import { Component, OnInit, ViewEncapsulation, Input, Output, EventEmitter } from '@angular/core';
+import { Component, OnInit, ViewEncapsulation, Output, EventEmitter } from '@angular/core';
 import * as io from 'socket.io-client';
 
 // interfaces
-import { Message } from '../models/message.interface';
+import { Message } from '../../models/message.interface';
+import { User } from '../../models/user.interface';
 
 // services
 import { GlobalService } from '../../utils/global.service';
 import { ChatService } from '../chat.service';
 import { ActivatedRoute, Params } from '@angular/router';
-import { UserDetails } from '../models/user-details.interface';
 
 const CHAT_SOCKET_ENDPOINT = 'localhost:3000/chat';
 const USERS_SOCKET_ENDPOINT = 'localhost:3000/user-status';
@@ -20,8 +20,8 @@ const USERS_SOCKET_ENDPOINT = 'localhost:3000/user-status';
     encapsulation: ViewEncapsulation.None
 })
 export class DirectMessageComponent implements OnInit { 
-    private chatSocket: io = undefined;
-    private userSocket: io = undefined;
+    private chatSocket: io;
+    private userSocket: io;
     conversation: string;
     messageText: string = '';
     chatId: string = '';
@@ -33,12 +33,13 @@ export class DirectMessageComponent implements OnInit {
     @Output()
     messagesChange: EventEmitter<any> = new EventEmitter();
 
-    receiver: UserDetails = {
+    receiver: User = {
         uuid: '',
         firstName: '',
         lastName: '',
         fullName: undefined,
         email: '',
+        description: undefined,
         pictureURL: ''
     }
 
@@ -82,7 +83,7 @@ export class DirectMessageComponent implements OnInit {
                     container.removeChild(container.firstChild);
                 }
 
-                this.chatService.getUserByUUID(data.conversation).subscribe((user: UserDetails) => {          
+                this.chatService.getUserByUUID(data.conversation).subscribe((user: User) => {          
                     this.receiver = user;
 
                     this.chatService.getProfilePicture(this.receiver.email).subscribe((pictureURL: string) => {
@@ -92,7 +93,7 @@ export class DirectMessageComponent implements OnInit {
                             this.receiver.pictureURL = pictureURL;
                         }
 
-                        this.chatService.getUUID(this.globalService.getCurrentUser()).subscribe((success: any) => {
+                        this.chatService.getUUIDbyEmail(this.globalService.getCurrentUser()).subscribe((success: any) => {
                             this.chatId = success.uuid > data.conversation ?
                                             data.conversation + '_' + success.uuid : 
                                             success.uuid + '_' + data.conversation;
@@ -127,7 +128,7 @@ export class DirectMessageComponent implements OnInit {
         this.messagesChange.emit(msg.timestamp);
 
         let wrapperDiv = document.createElement('div');
-        wrapperDiv.className = 'd-flex justify-content-end mb-4';
+        wrapperDiv.className = 'd-flex justify-content-end mb-1';
 
         let message = document.createElement('div');
         message.className = 'msg_cotainer_send';
@@ -142,6 +143,23 @@ export class DirectMessageComponent implements OnInit {
         msgTime.className = 'msg_time_send text-right';
         msgTime.style.width = '150px';
         msgTime.innerHTML = this.getDateAgo(msg.timestamp);
+        msgTime.style.display = 'none';
+
+        message.onclick = (event: any) => {
+            if(event.target.tagName.toLowerCase() === 'span') {
+               return; 
+            }
+
+            if(msgTime.style.display === 'none') {
+                msgTime.style.display = 'block';
+                wrapperDiv.classList.remove("mb-1");
+                wrapperDiv.className += " mb-4";
+            } else {
+                msgTime.style.display = 'none';
+                wrapperDiv.classList.remove("mb-4");
+                wrapperDiv.className += " mb-1";
+            } 
+        }
         
         setInterval(() => {
             msgTime.innerHTML = this.getDateAgo(msg.timestamp);
@@ -163,7 +181,7 @@ export class DirectMessageComponent implements OnInit {
         this.messagesChange.emit(message.timestamp);
 
         let wrapperDiv = document.createElement('div');
-        wrapperDiv.className = "d-flex justify-content-start mb-4";
+        wrapperDiv.className = "d-flex justify-content-start mb-1";
 
         let imageDiv = document.createElement('div');
         imageDiv.className = 'img_cont_msg';
@@ -181,6 +199,23 @@ export class DirectMessageComponent implements OnInit {
         msgTimeSent.className = 'msg_time';
         msgTimeSent.style.width = '150px';
         msgTimeSent.innerHTML = this.getDateAgo(message.timestamp);
+        msgTimeSent.style.display = 'none';
+
+        messageDiv.onclick = (event: any) => {
+            if(event.target.tagName.toLowerCase() === 'span') {
+               return; 
+            }
+
+            if(msgTimeSent.style.display === 'none') {
+                msgTimeSent.style.display = 'block';
+                wrapperDiv.classList.remove("mb-1");
+                wrapperDiv.className += " mb-4";
+            } else {
+                msgTimeSent.style.display = 'none';
+                wrapperDiv.classList.remove("mb-4");
+                wrapperDiv.className += " mb-1";
+            } 
+        }
         
         setInterval(() => {
             msgTimeSent.innerHTML = this.getDateAgo(message.timestamp);
@@ -270,8 +305,18 @@ export class DirectMessageComponent implements OnInit {
 
         this.userSocket.emit('getOnlineUsers');
 
-        this.userSocket.on('users', (users: string[]) => {
+        this.userSocket.on('onlineUsers', (users: string[]) => {
             this.onlineUsers = users;
+        });
+
+        this.userSocket.on('onlineUser', (newUser: string) => {
+            if(this.onlineUsers.includes(newUser)) {
+                this.onlineUsers.push(newUser);
+            }
+        });
+
+        this.userSocket.on('offlineUser', (userToRemove: string) => {
+            this.onlineUsers = this.onlineUsers.filter(user => user !== userToRemove);
         });
     }
 
@@ -328,9 +373,13 @@ export class DirectMessageComponent implements OnInit {
                         }
                     } else 
                         if (delta < 3 * 86400) { // sent on last 3 days
+                            if(Math.floor(delta / 86400) === 1) {
+                                result = Math.floor(delta / 86400) + ' day ago';
+                            } else {
                                 result = Math.floor(delta / 86400) + ' days ago';
+                            }
                         } else { // sent more than three days ago
-                            result = new Date(timestamp).toLocaleDateString('en-GB') + ' ' +
+                            result = new Date(timestamp).toLocaleDateString(undefined, { day: 'numeric', month: 'long', year: 'numeric' }) + ' at ' +
                                         new Date(timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
                         }
         return result;

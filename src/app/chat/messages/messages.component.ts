@@ -1,7 +1,7 @@
-import { Component, OnInit, Output, EventEmitter, Input, OnChanges } from '@angular/core';
+import { Component, OnInit, Input, OnChanges } from '@angular/core';
 
 // interfaces
-import { UserDetails } from '../models/user-details.interface';
+import { User } from '../../models/user.interface';
 
 // services
 import { GlobalService } from '../../utils/global.service';
@@ -18,9 +18,9 @@ const CHAT_SOCKET_ENDPOINT = 'localhost:3000/chat';
     styleUrls: ['./messages.component.scss']
 })
 export class MessagesComponent implements OnInit, OnChanges {
-    private userSocket: io = undefined;
-    private chatSocket: io = undefined;
-    connections: UserDetails[] = [];
+    private userSocket: io;
+    private chatSocket: io;
+    connections: User[] = [];
     onlineUsers: string[] = [];
     selectedUserUUID: string = '';
     currentUserUUID: string;
@@ -31,7 +31,7 @@ export class MessagesComponent implements OnInit, OnChanges {
     timestamp: number = 0;
 
     // input autocomplete
-    allUsers: UserDetails[] = [];
+    allUsers: User[] = [];
     searchKeyword: string = 'fullName';
     placeholder: string = 'Search...';
     notFoundMessage: string = 'No results...';
@@ -47,7 +47,7 @@ export class MessagesComponent implements OnInit, OnChanges {
         const email = this.globalService.getCurrentUser();
 
         this.route.params.subscribe((data: Params) => {
-            this.chatService.getAllUsers().subscribe((users: UserDetails[]) => {
+            this.chatService.getAllUsers().subscribe((users: User[]) => {
                 this.allUsers = users;
 
                 this.allUsers.forEach(user => {
@@ -73,7 +73,7 @@ export class MessagesComponent implements OnInit, OnChanges {
 
             this.selectedUserUUID = data.conversation;
 
-            this.chatService.getUUID(email).subscribe((response: any) => {
+            this.chatService.getUUIDbyEmail(email).subscribe((response: any) => {
                 this.currentUserUUID = response.uuid;
             });
 
@@ -112,12 +112,22 @@ export class MessagesComponent implements OnInit, OnChanges {
         //users socket
         this.userSocket = io(USERS_SOCKET_ENDPOINT);
 
-        this.userSocket.on('users', (users: string[]) => {
+        this.userSocket.on('onlineUsers', (users: string[]) => {
             this.onlineUsers = users;
+        });
+
+        this.userSocket.on('onlineUser', (newUser: string) => {
+            if(this.onlineUsers.includes(newUser) === false) {
+                this.onlineUsers.push(newUser);
+            }           
+        });
+
+        this.userSocket.on('offlineUser', (userToRemove: string) => {
+            this.onlineUsers = this.onlineUsers.filter(user => user !== userToRemove);
         });
     }
 
-    compareUsersArray(currentArray: UserDetails[], newArray: UserDetails[]): boolean {
+    compareUsersArray(currentArray: User[], newArray: User[]): boolean {
         const arraysLength = currentArray.length;
 
         if(arraysLength !== newArray.length) {
@@ -134,7 +144,7 @@ export class MessagesComponent implements OnInit, OnChanges {
     }
 
     getConnections(): void {
-        this.chatService.getConnectionsByEmail(this.globalService.getCurrentUser()).subscribe((users: UserDetails[]) => {
+        this.chatService.getConnectionsByEmail(this.globalService.getCurrentUser()).subscribe((users: User[]) => {
             if(this.connections === [] || this.compareUsersArray(this.connections, users) === false) {
                 for(let conversation of this.conversations) {
                     this.chatSocket.emit('leaveRoom', conversation);
@@ -204,7 +214,7 @@ export class MessagesComponent implements OnInit, OnChanges {
         this.router.navigateByUrl('chat/' + uuid);
     }
 
-    startConversation(user: UserDetails) {
+    startConversation(user: User) {
         this.router.navigateByUrl('chat/' + user.uuid);
     }
 }

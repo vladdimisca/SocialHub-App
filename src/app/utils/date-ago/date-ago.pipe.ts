@@ -63,7 +63,11 @@ export class DateAgoPipe extends AsyncPipe {
                             }
                         } else 
                             if (delta < 3 * 86400) { // sent on last 3 days
+                                if(Math.floor(delta / 86400) === 1) {
+                                    result = Math.floor(delta / 86400) + ' day ago';
+                                } else {
                                     result = Math.floor(delta / 86400) + ' days ago';
+                                }
                             } else { // sent more than three days ago
                                 result = this.datePipe.transform(this.value, 'MMMM d, y h:mm a');
                             }

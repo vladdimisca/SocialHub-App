@@ -4,7 +4,7 @@ import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ProfileRoutingModule } from './profile-routing.module';
 import { NavbarModule } from '../navbar/navbar.module';
-import { HttpClientModule } from '@angular/common/http';
+import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
 
 // components
@@ -17,6 +17,10 @@ import { SettingsComponent } from './settings/settings.component';
 // services
 import { GlobalService } from '../utils/global.service';
 import { ProfileService } from './profile.service';
+
+// interceptors
+import { JwtInterceptor } from '../utils/interceptors/jwt.interceptor';
+import { ErrorInterceptor } from '../utils/interceptors/error.interceptor';
 
 @NgModule({
     declarations: [
@@ -33,7 +37,13 @@ import { ProfileService } from './profile.service';
         NavbarModule,
         HttpClientModule
     ],
-    providers: [GlobalService, ProfileService],
+    providers: [
+        { provide: HTTP_INTERCEPTORS, useClass: JwtInterceptor, multi: true },
+        { provide: HTTP_INTERCEPTORS, useClass: ErrorInterceptor, multi: true },
+        GlobalService,
+        ProfileService, 
+        JwtInterceptor
+    ],
     bootstrap: []
 })
 export class ProfileModule {}
