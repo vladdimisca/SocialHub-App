@@ -4,7 +4,7 @@ import { Router, NavigationEnd, ActivatedRoute } from '@angular/router';
 import { map, filter } from 'rxjs/operators';
 
 // services
-import { Title } from '@angular/platform-browser'
+import { Title } from '@angular/platform-browser';
 
 @Component({
   selector: 'app-root',
@@ -26,16 +26,19 @@ export class AppComponent implements OnInit {
         filter(event => event instanceof NavigationEnd),
         map(() => {
           let child = this.activatedRoute.firstChild;
+
           while(child.firstChild) {
             child = child.firstChild;
           }
+
           if(child.snapshot.data['title']) {
             return child.snapshot.data['title'];
           }
+
           return appTitle;
         })
       ).subscribe((ttl: string) => {
-        this.titleService.setTitle(ttl);
+          this.titleService.setTitle(ttl);
       });
   }
 }

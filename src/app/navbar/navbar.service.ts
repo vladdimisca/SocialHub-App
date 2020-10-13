@@ -8,8 +8,12 @@ export class NavbarService {
     constructor(
         private httpClient: HttpClient
     ) {}
-    
-    getUsersByName(searchString: string): Observable<any> {
-        return this.httpClient.get('http://localhost:3000/api/usersByName?searchString=' + searchString);
+
+    getAllUsers(): Observable<any> {
+        return this.httpClient.get('http://localhost:3000/api/getAllUsers');
+    }
+
+    getProfilePicture(email: string): Observable<any> {
+        return this.httpClient.get('http://localhost:3000/api/getProfilePicture?email=' + email);
     }
 }

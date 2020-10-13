@@ -1,7 +1,7 @@
 <app-navbar [navLinks]="true"></app-navbar>
 
 <div class="container">
-    <app-details></app-details>
-    <app-gallery></app-gallery>
+    <app-details [numberOfPosts]="posts.length"></app-details>
+    <app-gallery [posts]="posts"></app-gallery>
 </div>
 

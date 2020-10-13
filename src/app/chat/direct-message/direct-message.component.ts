@@ -1,51 +1,51 @@
-import { Component, OnInit, ViewEncapsulation, Input } from '@angular/core';
+import { Component, OnInit, Output, EventEmitter, AfterViewInit, ViewChild, ViewChildren, QueryList, ElementRef } from '@angular/core';
 import * as io from 'socket.io-client';
 
 // interfaces
-import { Message } from '../models/message.interface';
+import { Message } from '../../models/message.interface';
+import { User } from '../../models/user.interface';
 
 // services
 import { GlobalService } from '../../utils/global.service';
 import { ChatService } from '../chat.service';
-import { ActivatedRoute, Params, Router } from '@angular/router';
-import { UserDetails } from '../models/user-details.interface';
-import { Subscription } from 'rxjs';
+import { ActivatedRoute, Params } from '@angular/router';
 
-const SOCKET_ENDPOINT = 'localhost:3000/chat';
-const USERS_SOCKET = 'localhost:3000/user-status';
+const CHAT_SOCKET_ENDPOINT = 'localhost:3000/chat';
+const USERS_SOCKET_ENDPOINT = 'localhost:3000/user-status';
 
 @Component({
     selector: 'app-direct-message',
     templateUrl: './direct-message.component.html',
     styleUrls: ['./direct-message.component.scss'],
-    encapsulation: ViewEncapsulation.None
 })
-export class DirectMessageComponent implements OnInit { 
-    private socket: io;
+export class DirectMessageComponent implements OnInit, AfterViewInit { 
+    @ViewChild('scrollframe', {static: false}) scrollFrame: ElementRef;
+    @ViewChildren('message') messageElements: QueryList<any>;
+
+    private chatSocket: io;
     private userSocket: io;
+    conversation: string;
     messageText: string = '';
     chatId: string = '';
     typing: boolean = false;
     timeout: any;
     typingUser: string = '';
     onlineUsers: string[] = [];
+    messages: Message[] = [];
+    currentUser: string;
 
-    subsParams: Subscription;
-    subsParams1: Subscription;
-    subsChatUUID: Subscription;
-    subsUser: Subscription;
-    subsEmail: Subscription;
-    subsMessages: Subscription;
+    @Output()
+    messagesChange: EventEmitter<any> = new EventEmitter();
 
-    receiver: UserDetails = {
+    receiver: User = {
         uuid: '',
         firstName: '',
         lastName: '',
-        email: ''
+        fullName: undefined,
+        email: '',
+        description: undefined,
+        pictureURL: ''
     }
-
-    @Input()
-    receiverUUID: string;
 
     private message: Message = {
         messageId: undefined,
@@ -57,164 +57,142 @@ export class DirectMessageComponent implements OnInit {
         seen: false
     };
     
+    // view fields
+    private scrollContainer: any;
+    private isNearBottom = true;
+
     constructor(
         private route: ActivatedRoute,
-        private router: Router,
         private globalService: GlobalService,
         private chatService: ChatService
     ) {}
-    
-    ngOnChanges() {
-        if(this.receiverUUID !== '') {
-            let container = document.getElementById('msg-container');
 
-            // clear the messages' container
-            while (container.firstChild) {
-                container.removeChild(container.firstChild);
-            }
+    ngAfterViewInit() {
+        this.scrollContainer = this.scrollFrame.nativeElement;
+        this.messageElements.changes.subscribe(_ => this.onMessageElementsChanged());    
+    }
 
-            // close the sockets
-            this.socket.close();
-            this.userSocket.close();
-            
-            // these are always !== undefined
-            this.subsUser.unsubscribe();
-            this.subsParams.unsubscribe();
-            this.subsMessages.unsubscribe();
-            this.subsChatUUID.unsubscribe();
+    onMessageElementsChanged() {
+        if (this.isNearBottom) {
+            this.scrollToBottom();
+        }
+    }
 
-            if(this.subsEmail !== undefined) {
-                this.subsEmail.unsubscribe();
-            }
-            
-            if(this.subsParams1 !== undefined) {
-                this.subsParams1.unsubscribe();
-            }
+    private isUserNearBottom(): boolean {
+        const threshold = 150;
+        const position = this.scrollContainer.scrollTop + this.scrollContainer.offsetHeight;
+        const height = this.scrollContainer.scrollHeight;
 
-            this.router.navigate(['chat/' + this.receiverUUID]).then(() => {
-                this.setup();
-            });
-        } 
+        return position > height - threshold;
+    }
+
+    private scrollToBottom(): void {
+        this.scrollContainer.scroll({
+          top: this.scrollContainer.scrollHeight,
+          left: 0,
+          behavior: 'smooth'
+        });
+    }
+
+    scrolled(): void {
+        this.isNearBottom = this.isUserNearBottom();
     }
 
     ngOnInit() {
-        this.setup();
+        this.currentUser = this.globalService.getCurrentUser();
+        this.setup(); 
     }   
 
     setup(): void {
-        this.subsParams = this.route.params.subscribe((data: Params) => {
-            this.subsUser = this.chatService.getUserByUUID(data.conversation).subscribe((user: any) => {          
-                this.receiver.firstName = user?.firstName;
-                this.receiver.lastName = user?.lastName;
-                this.receiver.email = user?.email;
-            })
+        this.route.params.subscribe((data: Params) => {
+            if(this.chatSocket !== undefined) {
+                this.chatSocket.close();
+            }
 
-            this.subsChatUUID = this.chatService.getUUID(this.globalService.getCurrentUser()).subscribe((success: any) => {
-                this.chatId = success.uuid > data.conversation ?
-                                data.conversation + '_' + success.uuid : 
-                                success.uuid + '_' + data.conversation;
+            if(this.userSocket !== undefined) {
+                this.userSocket.close();
+            }
 
-                this.getMessages();   
-                this.setupSocketConnection();
-            });
-        }) 
+            this.conversation = data.conversation;
+            
+            if(this.conversation !== 'inbox') {
+                this.chatService.getUserByUUID(data.conversation).subscribe((user: User) => {          
+                    this.receiver = user;
+
+                    this.chatService.getProfilePicture(this.receiver.email).subscribe((pictureURL: string) => {
+                        if(pictureURL === null) {
+                            this.receiver.pictureURL = "assets/images/blank.jpg";
+                        } else {
+                            this.receiver.pictureURL = pictureURL;
+                        }
+
+                        this.chatService.getUUIDbyEmail(this.globalService.getCurrentUser()).subscribe((success: any) => {
+                            this.chatId = success.uuid > data.conversation ?
+                                            data.conversation + '_' + success.uuid : 
+                                            success.uuid + '_' + data.conversation;
+        
+                            this.getMessages();   
+                            this.setupSocketConnection();
+                        });
+                    });
+                });
+            }
+        });
     }
 
     getMessages(): void {
-        this.subsMessages = this.chatService.getMessages(this.chatId).subscribe((messages: Message[]) => {   
-            const messageBody = document.getElementById('msg-container');
+        this.chatService.getMessages(this.chatId).subscribe((messages: Message[]) => { 
+            this.messages = messages;
 
-            messages.forEach(message => {
-                if(message.sender === this.globalService.getCurrentUser()) {
-                    this.addSenderMessage(message);
-                } else {
-                    this.addReceiverMessage(message);
+            this.messages.forEach(message => {
+                if(message.seen === false) {
+                    message.seen = true;
+                    this.chatSocket.emit("seenMessage", this.chatId, message.messageId, message.sender, message.receiver, message.timestamp);
                 }
-                
-                messageBody.scrollTop = messageBody.scrollHeight - messageBody.clientHeight;
             });
         });  
     }
 
-    addSenderMessage(msg: Message): void {
-        let wrapperDiv = document.createElement('div');
-        wrapperDiv.className = 'd-flex justify-content-end mb-4';
-
-        let message = document.createElement('div');
-        message.className = 'msg_cotainer_send';
-        message.innerHTML = msg.message;
-        message.id = msg.messageId;
-
-        if(msg.seen === true) {
-            message.style.backgroundColor = 'rgb(153, 214, 255)';
-        }
-
-        let msgTime = document.createElement('span');
-        msgTime.className = 'msg_time_send text-right';
-        msgTime.style.width = '150px';
-
-        const date = new Date();
-
-        if(date.getTime() - msg.timestamp > 24 * 60 * 60 * 1000) {
-            msgTime.innerHTML = new Date(msg.timestamp).toLocaleDateString('en-GB') + ' '  + 
-                                        new Date(msg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-        } else {
-            msgTime.innerHTML = new Date(msg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-        }
-        
-        message.appendChild(msgTime);
-        wrapperDiv.appendChild(message);
-
-        let msgContainer = document.getElementById('msg-container');
-        msgContainer.appendChild(wrapperDiv);
+    addSenderMessage(message: Message): void {
+        this.messagesChange.emit(message.timestamp);
+        this.messages.push(message);
     }
 
     addReceiverMessage(message: Message): void {
         if(message.seen === false) {
             message.seen = true;
-            this.socket.emit("seenMessage", this.chatId, message.messageId);
+            this.chatSocket.emit("seenMessage", this.chatId, message.messageId, message.sender, message.receiver, message.timestamp);
         }
 
-        let wrapperDiv = document.createElement('div');
-        wrapperDiv.className = "d-flex justify-content-start mb-4";
+        this.messagesChange.emit(message.timestamp);
+        this.messages.push(message);
+    }
 
-        let imageDiv = document.createElement('div');
-        imageDiv.className = 'img_cont_msg';
+    handleDate(event: any): void {
+        const element = event.target;
 
-        let img = document.createElement('img');
-        img.className = 'rounded-circle user_img_msg'
-        img.src = "https://static.turbosquid.com/Preview/001292/481/WV/_D.jpg";
+        if(element.tagName.toLowerCase() === 'span') {
+           return; 
+        }
+        
+        const timeSpan = element.getElementsByTagName('span')[0];
 
-        let messageDiv = document.createElement('div');
-        messageDiv.className = 'msg_cotainer';
-        messageDiv.innerHTML = message.message;
-        messageDiv.id = message.messageId;
-                
-        let msgTimeSend = document.createElement('span');
-        msgTimeSend.className = 'msg_time';
-        msgTimeSend.style.width = '150px';
-
-        const date = new Date();
-
-        if(date.getTime() - message.timestamp > 24 * 60 * 60 * 1000) {
-            msgTimeSend.innerHTML = new Date(message.timestamp).toLocaleDateString('en-GB') + ' ' +
-                                            new Date(message.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        if(timeSpan.classList.contains('not-displayed')) {
+            timeSpan.classList.remove('not-displayed');
+            timeSpan.className += ' displayed';
+            element.classList.remove("mb-1");
+            element.className += " mb-4";
         } else {
-            msgTimeSend.innerHTML = new Date(message.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-        }
-                
-        messageDiv.appendChild(msgTimeSend);
-        imageDiv.appendChild(img);
-        wrapperDiv.appendChild(imageDiv);
-        wrapperDiv.appendChild(messageDiv);
-
-        let msgContainer = document.getElementById('msg-container');
-        msgContainer.appendChild(wrapperDiv);
+            timeSpan.classList.remove('displayed');
+            timeSpan.className += ' not-displayed';
+            element.classList.remove("mb-4");
+            element.className += " mb-1";
+        } 
     }
 
     stopTyping(): void {
         this.typing = false;
-        this.socket.emit('noLongerTyping', this.chatId);
+        this.chatSocket.emit('noLongerTyping', this.chatId);
     }
 
     userIsTyping(): void {
@@ -222,7 +200,7 @@ export class DirectMessageComponent implements OnInit {
 
         if(this.typing === false) {
             this.typing = true;
-            this.socket.emit('type', this.chatId, this.globalService.getCurrentUser(), this.receiver.email);
+            this.chatSocket.emit('type', this.chatId, this.globalService.getCurrentUser(), this.receiver.email);
 
             this.timeout = setTimeout(() => {
                 this.stopTyping();
@@ -238,83 +216,82 @@ export class DirectMessageComponent implements OnInit {
 
     setupSocketConnection(): void {
         // chat socket
-        this.socket = io(SOCKET_ENDPOINT);
+        this.chatSocket = io(CHAT_SOCKET_ENDPOINT);
 
-        this.socket.on('connect', () => {
-            this.socket.emit('setRoom', this.chatId);
+        this.chatSocket.on('connect', () => {
+            this.chatSocket.emit('setRoom', this.chatId);
         })
 
-        this.socket.on('message-broadcast', (message: Message) => {
-            const messageBody = document.getElementById('msg-container');
-            let notScrolled = false;
+        this.chatSocket.on('message-broadcast', (message: Message) => {
+            this.messagesChange.emit(message.timestamp);
 
             if (message !== undefined) {
                 if(message.sender === this.globalService.getCurrentUser()) {
                     this.addSenderMessage(message);
                 } else {
-                    if(messageBody.scrollTop + 200 < messageBody.scrollHeight - messageBody.clientHeight) {
-                        notScrolled = true;
-                    }
-
                     this.addReceiverMessage(message);
-                }
-                
-                if(notScrolled === false) {
-                    messageBody.scrollTop = messageBody.scrollHeight - messageBody.clientHeight;
                 }
             }
         });
 
-        this.socket.on('typing', (receiverEmail: string, firstName: string) => {
+        this.chatSocket.on('typing', (receiverEmail: string, firstName: string) => {
             if(receiverEmail === this.globalService.getCurrentUser()) {
                 this.typingUser = firstName;
             }  
         });
         
-        this.socket.on('stopTyping', () => {
+        this.chatSocket.on('stopTyping', () => {
             this.typingUser = '';
-        })
+        });
 
-        this.socket.on('seen', (messageId: string) => {
-            const message = document.getElementById(messageId);
-            message.style.backgroundColor = 'rgb(153, 214, 255)';
-        })
+        this.chatSocket.on('seen', (messageId: string) => {
+            this.messages.forEach(message => {
+                if(message.messageId === messageId) {
+                    message.seen = true;
+                }
+            });
+        });
 
         // users socket
-        this.userSocket = io(USERS_SOCKET);
+        this.userSocket = io(USERS_SOCKET_ENDPOINT);
 
         this.userSocket.emit('getOnlineUsers');
 
-        this.userSocket.on('users', (users: string[]) => {
+        this.userSocket.on('onlineUsers', (users: string[]) => {
             this.onlineUsers = users;
-        })
+        });
+
+        this.userSocket.on('onlineUser', (newUser: string) => {
+            if(this.onlineUsers.includes(newUser)) {
+                this.onlineUsers.push(newUser);
+            }
+        });
+
+        this.userSocket.on('offlineUser', (userToRemove: string) => {
+            this.onlineUsers = this.onlineUsers.filter(user => user !== userToRemove);
+        });
     }
 
-    sendMessage(): void { 
+    sendMessage(event: any): void { 
         if(!this.messageText.replace(/\s/g, '').length) {
             this.messageText = '';
             return;
         }
 
+        if(event instanceof KeyboardEvent) {
+            this.messageText = this.messageText.slice(0, -1);
+        }
+
         this.message.seen = false;
         this.message.chatId = this.chatId;
         this.message.sender = this.globalService.getCurrentUser();
+        this.message.receiver = this.receiver.email;
+        this.message.message = this.messageText;
         
-        this.subsParams1 = this.route.params.subscribe((data: Params) => {
-            this.subsEmail = this.chatService.getEmailByUUID(data.conversation).subscribe((success: any) => {
-                this.message.receiver = success.email;
-                this.message.message = this.messageText;
-        
-                const date = new Date();
-                this.message.timestamp = date.getTime();
-            
-                this.socket.emit('message', this.message);
-
-                const messageBody = document.getElementById('msg-container');
-                messageBody.scrollTop = messageBody.scrollHeight - messageBody.clientHeight;
-
-                this.messageText = '';
-            });
-        })
+        const date = new Date();
+        this.message.timestamp = date.getTime();
+                
+        this.chatSocket.emit('message', this.message);
+        this.messageText = '';
     }
 }

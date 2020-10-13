@@ -1,13 +1,15 @@
 import { Component, Input, OnInit } from '@angular/core';
+import * as io from 'socket.io-client';
 
 // models
-import { User } from './models/user.interface';
+import { User } from '../models/user.interface';
 
 // services
 import { GlobalService } from '../utils/global.service';
 import { NavbarService } from '../navbar/navbar.service';
 import { Router } from '@angular/router';
-import { Subscription } from 'rxjs';
+
+const USERS_SOCKET_ENDPOINT = 'localhost:3000/user-status';
 
 @Component({
     selector: 'app-navbar',
@@ -15,11 +17,19 @@ import { Subscription } from 'rxjs';
     styleUrls: ['navbar.component.scss']
 })
 export class NavbarComponent implements OnInit { 
+    userSocket: io;
+
     @Input() 
     navLinks: boolean = false;
     
-    subscribeUsers: Subscription;
     userProfileLink: string;
+    existingUser: boolean;
+
+    // autocomplete
+    users: User[] = [];
+    searchKeyword: string = 'fullName';
+    placeholder: string = 'Search...';
+    notFoundMessage: string = 'No results...';
     searchString: string = '';
 
     constructor(
@@ -29,20 +39,39 @@ export class NavbarComponent implements OnInit {
     ) {}
 
     ngOnInit() {
-        this.userProfileLink = 'profile/' + this.globalService.getCurrentUser();
+        this.userSocket = io(USERS_SOCKET_ENDPOINT);
+        this.existingUser = this.globalService.checkExistingUser();
+
+        if(this.existingUser === true) {
+            this.userProfileLink = 'profile/' + this.globalService.getCurrentUser();
+
+            this.navbarService.getAllUsers().subscribe((users: User[]) => {
+                this.users = users;
+
+                this.users.forEach(user => {
+                    user.fullName = user.firstName + ' ' + user.lastName;
+
+                    this.navbarService.getProfilePicture(user.email).subscribe((pictureURL: string) => {
+                        if(pictureURL === null) {
+                            user.pictureURL = "assets/images/blank.jpg";
+                        } else {
+                            user.pictureURL = pictureURL;
+                        }
+                    });
+                });
+            });
+        }
     }
 
     logout(): void {
+        const email = this.globalService.getCurrentUser();
+        this.userSocket.emit('setUserOffline', email);
+        
         this.globalService.removeCurrentUser();
+        this.globalService.removeToken();
     }
 
-    search(): void {
-        if(this.subscribeUsers !== undefined) {
-            this.subscribeUsers.unsubscribe();
-        }
-
-        this.subscribeUsers = this.navbarService.getUsersByName(this.searchString).subscribe((users: User[]) => {
-            console.log(users);
-        });
+    openProfile(user: User): void {
+        this.router.navigateByUrl('profile/' + user.email);
     }
 }

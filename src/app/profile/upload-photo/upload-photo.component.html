@@ -1,0 +1,55 @@
+<app-navbar [navLinks]="true"></app-navbar>
+
+<section class="hero">
+    <div class="container">
+      <div class="row">	
+        <div class="col-lg-6 offset-lg-3">
+            <div class="cardbox shadow-lg bg-white">
+                <div class="cardbox-heading">
+                    <div class="media m-0">
+                        <div *ngIf="profilePictureURL !== undefined" class="d-flex mr-3">
+                            <img class="img-fluid rounded-circle" [src]="profilePictureURL" alt="User">
+                        </div>
+                    <div class="media-body">
+
+                    <h5 class="m-0">{{ currentUser.firstName + ' ' + currentUser.lastName }}</h5>
+                </div>
+            </div>
+        </div>
+
+        <div class="media-body" style="margin: 0px 30px 30px 30px; ">
+            <textarea class="form-control" placeholder="Type a description..." [(ngModel)]="descriptionText"></textarea>
+
+            <br>
+
+            <img *ngIf="uploadedImageURL !== undefined" class="img-fluid" [src]="uploadedImageURL" alt="Image">
+                
+            <br *ngIf="uploadedImageURL !== undefined">
+            <br *ngIf="uploadedImageURL !== undefined">
+          
+            <div class="row">
+                <div class="col-xs-12 col-sm-6 emphasis">
+                    <div class="upload-btn-wrapper">
+                        <label class="btn btn-success btn-block" for="myFile" >  
+                            <span class="fa fa-image"></span> 
+                            <span *ngIf="uploadedImageURL === undefined"> Choose a photo</span>
+                            <span *ngIf="uploadedImageURL !== undefined"> Change photo</span>
+                        </label>  
+                        <input type="file" accept="image/*" id="myFile" (change)="uploadPhoto($event)" hidden>
+                    </div>
+                </div>
+                <div *ngIf="uploadedImageURL !== undefined" class="col-xs-12 col-sm-6 emphasis">
+                        <button class="btn btn-info btn-block" (click)="post()"> <span class="fa fa-share-square"></span> Post </button>
+                </div>
+                <div *ngIf="uploadedImageURL === undefined" class="col-xs-12 col-sm-6 emphasis">
+                    <button class="btn btn-info btn-block" style="opacity: 40%; cursor: context-menu;" disabled>
+                        <span class="fa fa-share-square" ></span> Post 
+                    </button>
+                </div>
+            </div>
+        </div>
+       </div>
+      </div>
+     </div>
+    </div>
+</section>

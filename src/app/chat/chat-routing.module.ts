@@ -2,12 +2,18 @@ import { NgModule } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
 
 // components
-import { InboxComponent } from './inbox/inbox.component';
 import { ConversationComponent } from './conversation/conversation.component';
 
+// guards
+import { AuthGuard } from '../utils/guards/auth.guard';
+
 const routes: Routes = [
-    {path: 'inbox', component: InboxComponent, data: {title: 'Inbox'}},
-    {path: ':conversation', component: ConversationComponent, data: {title: 'Conversation'}}
+    {
+      path: ':conversation', 
+      component: ConversationComponent,
+      canActivate: [AuthGuard], 
+      data: {title: 'Conversation'}
+    }
 ];
 
 @NgModule({

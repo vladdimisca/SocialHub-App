@@ -1,58 +1,14 @@
 <div class="mygallery">
-    <!--
-    <div class=" frame-square">
-        <div class="square">
-         <a href="assets\images\profile-photo.jpg" data-size="1600x1067">
-             <img src="assets\images\profile-photo.jpg" class="img-responsive square-photo">
-         </a> 
+    <div *ngFor="let post of posts" class="frame-square">
+        <div (click)="startOverlay(post)" class="square">
+                <img [src]="post.pictureURL" class="img-responsive square-photo"> 
          </div>
+    </div>  
+    <div *ngIf="overlay === true" id="overlay" (click)="stopOverlay()">
+        <div class="row absolute">
+            <div class="big-frame-square">
+                <img [src]="displayedPost.pictureURL" class="img-responsive square-photo">
+            </div>
+        </div>
     </div>
-     
-    <div class=" frame-square">
-     <div class="square">
-         <a href="assets\images\download.png" data-size="1600x1067">
-             <img src="assets\images\download.png" class="img-responsive square-photo">
-         </a>
-     </div>
-    </div>
-    
-    <div class=" frame-square">
-     <div class="square">
-         <a href="assets\images\random.jpg" data-size="1600x1067">
-             <img src="assets\images\random.jpg" class="img-responsive square-photo">
-         </a>    
-     </div>
-    </div>
-    
-    <div class=" frame-square">
-     <div class="square">
-         <a href="assets\images\random.jpg" data-size="1600x1067">
-             <img src="assets\images\random.jpg" class="img-responsive square-photo">
-         </a>
-     </div>
-    </div>
-    
-    <div class=" frame-square">
-     <div class="square">
-         <a href="assets\images\random.jpg" data-size="1600x1067">
-             <img src="assets\images\random.jpg" class="img-responsive square-photo">
-         </a>
-     </div>
-    </div>
-    
-    <div class=" frame-square">
-     <div class="square">
-         <a href="assets\images\random.jpg" data-size="1600x1067">
-             <img src="assets\images\random.jpg" class="img-responsive square-photo">
-         </a>
-     </div>
-    </div>
-    
-    <div class=" frame-square">
-     <div class="square">
-         <a href="assets\images\random.jpg" data-size="1600x1067">
-             <img src="assets\images\random.jpg" class="img-responsive square-photo">
-         </a>
-     </div>
-    </div>-->
  </div>

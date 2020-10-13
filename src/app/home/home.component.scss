@@ -105,8 +105,7 @@
       position: relative;
       display: block;
   }
-  .cardbox .cardbox-item img{
-  }
+  
   .img-responsive{
       display: block;
       max-width: 100%;
@@ -471,4 +470,13 @@
         margin: 0;
         background-color: #f6f7f8;
         border-top-color: #e9eaed;
-    }                                                            
+    }     
+    
+.remove-href-style {
+    text-decoration: none;
+    color: black;
+}
+
+.remove-href-style:hover {
+  color: black;
+}

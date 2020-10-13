@@ -1,31 +1,64 @@
 <div class="card">
-    <div class="card-header msg_head">
+    <div *ngIf="conversation !== 'inbox'" class="card-header msg_head">
         <div class="d-flex bd-highlight">
-            <div class="img_cont">
-                <img src="https://static.turbosquid.com/Preview/001292/481/WV/_D.jpg" class="rounded-circle user_img">
-                <span [ngClass]="{'offline': onlineUsers.indexOf(receiver.email) === -1}" class="online_icon"></span>
-            </div>
+            <a [href]="'profile/' + receiver.email">
+                <div *ngIf="receiver.pictureURL !== undefined" class="img_cont">
+                    <img [src]="receiver.pictureURL" alt="profile" class="rounded-circle user_img">
+                    <span [ngClass]="{'offline': onlineUsers.indexOf(receiver.email) === -1}" class="online_icon"></span>
+                </div>
+            </a>
+            
             <div class="user_info">
-                <span>{{ receiver.firstName + ' ' + receiver.lastName }}</span>
+                <a [href]="'profile/' + receiver.email" style="text-decoration: none;">
+                    <span>{{ receiver.firstName + ' ' + receiver.lastName }}</span>
+                </a>
             </div>		
         </div>
     </div>
     
-    <div class="card-body msg_card_body" id="msg-container">
+    <div class="card-body msg_card_body" id="msg-container" (scroll)="scrolled()" #scrollframe>
+        <div *ngIf="conversation === 'inbox'"> 
+            <h4> Start a new conversation</h4> 
+        </div>
+
+        <div *ngFor="let message of messages" #message>
+            <!-- sender message -->
+            <div *ngIf="currentUser === message.sender" class='d-flex justify-content-end mb-1'>
+                <div class="msg_cotainer_send" [ngClass]="{'seen': message.seen === true}" (click)="handleDate($event)"> 
+                    {{ message.message }}
+                    <span class="msg_time_send text-right not-displayed" style="width: 150px;">
+                         {{ message.timestamp | dateAgo }} 
+                    </span>
+                </div>
+            </div>
+
+            <!-- receiver message -->
+            <div *ngIf="currentUser === message.receiver" class='d-flex justify-content-start mb-1'>
+                <div class='img_cont_msg'>
+                    <img class='rounded-circle user_img_msg' *ngIf="receiver.pictureURL !== undefined" [src]="receiver.pictureURL" alt="profile">
+                </div>
+                
+                <div class="msg_cotainer" (click)="handleDate($event)"> 
+                    {{ message.message }}
+                    <span class="msg_time not-displayed" style="width: 150px;">
+                         {{ message.timestamp | dateAgo }} 
+                    </span>
+                </div>
+            </div>
+        </div>
     </div>
 
     <span id="typing-message" *ngIf="typingUser !== ''" >{{ typingUser }} is typing...</span>
 
-    <div class="card-footer">
+    <div *ngIf="conversation !== 'inbox'" class="card-footer">
         <div class="input-group">
             <div class="input-group-append">
                 <span class="input-group-text attach_btn"><i class="fas fa-paperclip"></i></span>
             </div>
-            <textarea (input)="userIsTyping()" (keyup.enter)="sendMessage()" name="chat" class="form-control type_msg" placeholder="Type your message..." [(ngModel)]="messageText" required ></textarea>
+            <textarea (input)="userIsTyping()" (keyup.enter)="sendMessage($event)" name="chat" class="form-control type_msg" placeholder="Type your message..." [(ngModel)]="messageText" required ></textarea>
             <div class="input-group-append">
-                <span class="input-group-text send_btn"  (click)="sendMessage()"><i class="fas fa-location-arrow"></i></span>
+                <span class="input-group-text send_btn"  (click)="sendMessage($event)"><i class="fas fa-location-arrow"></i></span>
             </div>
         </div>
     </div>
-</div>    
-
+</div>     

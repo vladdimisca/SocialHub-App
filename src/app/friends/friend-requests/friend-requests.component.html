@@ -1,0 +1,39 @@
+<app-navbar [navLinks]="true"></app-navbar>
+
+<section class="hero">
+    <div class="container">
+        <div class="row">	
+     
+            <div class="col-lg-6 offset-lg-3">
+       
+                <button class="activeButton" disabled>Friend requests</button>
+                <button class="nonActiveButton" (click)="openFriendsList()" >Friends</button>
+
+                <div class="cardbox shadow-lg bg-white" >
+                    <div *ngIf="friendRequests.length === 0" class="nearby-user centered">You don't have any friend requests.</div>
+                    <div *ngFor="let friendRequest of friendRequests">
+                      <div class="nearby-user" >
+                          <div class="row">
+                            <div *ngIf="friendRequest.pictureURL !== undefined" class="col1">
+                              <a [href]="'profile/' + friendRequest.email"><img [src]="friendRequest.pictureURL" alt="user" class="img-fluid rounded-circle"></a>
+                            </div>
+                            <div *ngIf="friendRequest.description !== undefined" class="col2">
+                              <h5><a [href]="'profile/' + friendRequest.email" class="profile-link">{{ friendRequest.firstName + ' ' + friendRequest.lastName }}</a></h5>
+                              <p *ngIf="friendRequest.description.length > 26">{{ friendRequest.description | slice:0:23 }}...</p> 
+                              <p *ngIf="friendRequest.description.length < 26">{{ friendRequest.description }}</p>
+                            </div>
+                            <div class="col3">
+                              <button class="btn btn-success" style="margin-right: 10px;" (click)="acceptRequest(friendRequest.email)">Accept</button>
+                              <button type="button" class="btn btn-danger" (click)="rejectRequest(friendRequest.email)">Ignore</button>
+                            </div>
+                          </div>
+                        </div>
+                        <hr>
+                    </div>
+                     
+                </div><!--/ cardbox -->
+
+            </div><!--/ col-lg-6 -->	               
+        </div><!--/ row -->
+    </div><!--/ container -->
+</section>       

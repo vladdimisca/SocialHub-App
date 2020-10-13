@@ -9,22 +9,34 @@ export class ChatService {
     ) {}
 
     getMessages(chatId: string): Observable<any> {
-        return this.httpClient.get('http://localhost:3000/api/chat?chatId=' + chatId);
+        return this.httpClient.get('http://localhost:3000/api/getChatMessages?chatId=' + chatId);
     }
 
     getConnectionsByEmail(email: string): Observable<any> {
-        return this.httpClient.get('http://localhost:3000/api/connections?email=' + email);
+        return this.httpClient.get('http://localhost:3000/api/getConnectionsByEmail?email=' + email);
     }
 
-    getUUID(email: string): Observable<any> {
-        return this.httpClient.get('http://localhost:3000/api/userUUID?email=' + email);
+    getUUIDbyEmail(email: string): Observable<any> {
+        return this.httpClient.get('http://localhost:3000/api/getUUIDbyEmail?email=' + email);
     }
 
     getEmailByUUID(uuid: string): Observable<any> {
-        return this.httpClient.get('http://localhost:3000/api/userEmail?uuid=' + uuid);
+        return this.httpClient.get('http://localhost:3000/api/getEmailByUUID?uuid=' + uuid);
     }
 
     getUserByUUID(uuid: string): Observable<any> {
-        return this.httpClient.get('http://localhost:3000/api/user?uuid=' + uuid)
+        return this.httpClient.get('http://localhost:3000/api/getUserByUUID?uuid=' + uuid)
+    }
+
+    getProfilePicture(email: string): Observable<any> {
+        return this.httpClient.get('http://localhost:3000/api/getProfilePicture?email=' + email);
+    }
+
+    checkUnseenMessages(sender: string, receiver: string): Observable<any> {
+        return this.httpClient.get('http://localhost:3000/api/checkUnseenMessages?sender=' + sender + '&receiver=' + receiver);
+    }
+
+    getAllUsers(): Observable<any> {
+        return this.httpClient.get('http://localhost:3000/api/getAllUsers');
     }
 }

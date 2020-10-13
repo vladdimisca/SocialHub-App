@@ -4,8 +4,15 @@ import { Routes, RouterModule } from '@angular/router';
 // components
 import { HomeComponent } from './home.component';
 
+// guards
+import { AuthGuard } from '../utils/guards/auth.guard';
+
 const routes: Routes = [
-  {path: '', component: HomeComponent }
+  {
+    path: '', 
+    component: HomeComponent, 
+    canActivate: [AuthGuard]
+  }
 ];
 
 @NgModule({

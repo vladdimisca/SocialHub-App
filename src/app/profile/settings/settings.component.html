@@ -1,0 +1,72 @@
+<app-navbar [navLinks]="true"></app-navbar>
+<section class="hero">
+    <div class="container">
+     <div class="row">	
+     
+      <div class="col-lg-6 offset-lg-3">
+       
+       <div class="cardbox shadow-lg bg-white">
+           <h2 style="text-align: center; padding-top: 30px;">Profile Settings</h2>
+
+        <!-- Profile Settings-->
+            <form ngNativeValidate class="row" style="padding: 30px;">
+                
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label for="account-fn">First Name</label>
+                        <input  autocomplete="off" name="firstName" [(ngModel)]="firstName" class="form-control" type="text" id="account-fn" required="required">
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label for="account-ln">Last Name</label>
+                        <input autocomplete="off" name="lastName" [(ngModel)]="lastName" class="form-control" type="text" id="account-ln" required="required">
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label for="account-email">E-mail Address</label>
+                        <input class="form-control" type="email" id="account-email" [value]="currentUser.email" disabled="">
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label for="account-phone">Profile description</label>
+                        <input autocomplete="off" name="description" [(ngModel)]="description" class="form-control" type="text" id="description" >
+                    </div>
+                </div>
+                <div class="col-12">
+                    <hr class="mt-2 mb-3">
+                    <div>
+                        <button type="submit" (click)='updateProfile()' class="btn btn-style-1 btn-purple" style="background-color: rgba(94, 19, 180, 0.979); color: white;" data-toast="" data-toast-position="topRight" data-toast-type="success" data-toast-icon="fe-icon-check-circle" data-toast-title="Success!" data-toast-message="Your profile updated successfuly.">Update Profile</button>
+                        <i *ngIf="profileUpdated" class="fa fa-check check-style" aria-hidden="true"></i>
+                        <i *ngIf="updateError" class="fa fa-times" aria-hidden="true"></i>
+                    </div>
+                    <br>
+                    <br>
+                </div>
+                
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label for="account-pass">New Password</label>
+                        <input class="form-control" type="password" id="account-pass">
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label for="account-confirm-pass">Confirm Password</label>
+                        <input class="form-control" type="password" id="account-confirm-pass">
+                    </div>
+                </div>
+                <div class="col-12">
+                    <hr class="mt-2 mb-3">
+                    <div class="d-flex flex-wrap justify-content-between align-items-center">
+                        <button class="btn btn-style-1 btn-purple" style="background-color: rgba(94, 19, 180, 0.979); color: white;" type="button" data-toast="" data-toast-position="topRight" data-toast-type="success" data-toast-icon="fe-icon-check-circle" data-toast-title="Success!" data-toast-message="Your profile updated successfuly.">Update Password</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+</div>
+</section>

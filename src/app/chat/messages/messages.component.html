@@ -2,26 +2,50 @@
     <div class="card-header">
         <h4>Direct Messages</h4>
         <br>
-        <div class="input-group">
-            <input type="text" placeholder="Search..." name="" class="form-control search">
-            <div class="input-group-prepend">
-                <span class="input-group-text search_btn"><i class="fas fa-search"></i></span>
-            </div>
+        <div class="flex-container">
+            <ng-autocomplete
+                [(ngModel)]="searchString"
+                [data]="allUsers"
+                [searchKeyword]="searchKeyword"
+                [itemTemplate]="itemTemplate"
+                [notFoundTemplate]="notFoundTemplate"
+                [placeHolder]="placeholder" 
+                (selected)="startConversation($event)">                               
+            </ng-autocomplete>
+
+            <span class="input-group-text search_btn" ><i class="fas fa-search"></i></span>
         </div>
+        
+        <ng-template #itemTemplate let-user>
+            <div class="user" [ngStyle]="{'display': searchString === '' ? 'none' : 'block'}">
+                <img *ngIf="user.pictureURL !== undefined" [src]="user.pictureURL" alt="user" class="rounded-circle">
+                <span [innerHTML]="user.firstName + ' ' + user.lastName"></span>
+            </div>
+        </ng-template>
+             
+        <ng-template #notFoundTemplate>
+            <div style="text-align: center;" [innerHTML]="notFoundMessage"></div>
+        </ng-template>
     </div>
 
     <div class="card-body contacts_body">
-        <ul class="contacts" *ngFor="let user of users" (click)="openConversation(user.uuid)">
-            <li [ngClass]="{'active': currentUUID === user.uuid}">
+        <ul class="contacts" *ngFor="let user of connections" (click)="openConversation(user.uuid, user.email)">
+            <li [ngClass]="{'active': selectedUserUUID === user.uuid}">
                 <div class="d-flex bd-highlight">
-                    <div class="img_cont">
-                        <img src="https://static.turbosquid.com/Preview/001292/481/WV/_D.jpg" class="rounded-circle user_img">
+                    <div *ngIf="user.pictureURL !== undefined" class="img_cont">
+                        <img [src]="user.pictureURL" alt="profile img" class="rounded-circle user_img">
                         <span [ngClass]="{'offline': onlineUsers.indexOf(user.email) === -1}" class="online_icon"></span>
                     </div>
                     <div class="user_info">
-                        <span>{{ user.firstName + ' ' + user.lastName }}</span>
-                        <p *ngIf="onlineUsers.indexOf(user.email) !== -1">{{ user.firstName }} is online</p>
-                        <p *ngIf="onlineUsers.indexOf(user.email) === -1">{{ user.firstName }} is offline</p>
+                        <span [ngStyle]="{'color': unseenArray.includes(user.email) ? 'rgb(153, 214, 255)' : 'white'}">
+                            {{ user.firstName + ' ' + user.lastName }}
+                        </span>
+                        <p *ngIf="onlineUsers.indexOf(user.email) !== -1" [ngStyle]="{'color': unseenArray.includes(user.email) ? 'rgb(153, 214, 255)' : 'white'}">
+                            {{ user.firstName }} is online
+                        </p>
+                        <p *ngIf="onlineUsers.indexOf(user.email) === -1" [ngStyle]="{'color': unseenArray.includes(user.email) ? 'rgb(153, 214, 255)' : 'white'}">
+                            {{ user.firstName }} is offline
+                        </p>
                     </div>
                 </div>
             </li>
