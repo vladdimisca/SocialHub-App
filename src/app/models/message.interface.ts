@@ -1,6 +1,6 @@
 export interface Message {
-    messageId: string | undefined,
-    chatId: string | undefined,
+    messageId: string,
+    chatId: string,
     sender: string,
     receiver: string,
     message: string,
