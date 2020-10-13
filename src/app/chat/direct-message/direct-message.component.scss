@@ -4,6 +4,14 @@ body,html{
     overflow-y: hidden;
 }
 
+span.not-displayed {
+    display: none;
+}
+
+span.displayed {
+    display: block;
+}
+
 h4{
     color: white;
     text-align: center;
@@ -176,6 +184,10 @@ position: relative;
 #typing-message {
     color: whitesmoke;
     margin-left: 5%;
+}
+
+.seen {
+    background-color: rgb(153, 214, 255);
 }
 
 @media(max-width: 780px) {

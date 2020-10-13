@@ -8,6 +8,9 @@ import { FormsModule } from '@angular/forms';
 import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 import { AutocompleteLibModule } from 'angular-ng-autocomplete';
 
+// pipes
+import { DateAgoModule } from '../utils/date-ago/date-ago.module';
+
 // components
 import { MessagesComponent } from './messages/messages.component';
 import { DirectMessageComponent } from './direct-message/direct-message.component';
@@ -34,6 +37,7 @@ import { ErrorInterceptor } from '../utils/interceptors/error.interceptor';
         HttpClientModule,
         ChatRoutingModule,
         NavbarModule,
+        DateAgoModule
     ],
     providers: [
         { provide: HTTP_INTERCEPTORS, useClass: JwtInterceptor, multi: true },

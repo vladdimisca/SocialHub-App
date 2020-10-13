@@ -6,7 +6,8 @@
         
         <div *ngIf="navLinks" class="example">
             <div class="input-flex-container">
-                <ng-autocomplete
+                <ng-autocomplete 
+                    [(ngModel)]="searchString"
                     [minQueryLength]="'1'"
                     [data]="users"
                     [searchKeyword]="searchKeyword"
@@ -20,7 +21,7 @@
             </div>
 
             <ng-template #itemTemplate let-user>
-                <div class="user">
+                <div class="user" [ngStyle]="{'display': searchString === '' ? 'none' : 'block'}">
                     <img *ngIf="user.pictureURL !== undefined" [src]="user.pictureURL" alt="user" class="rounded-circle">
                     <span [innerHTML]="user.firstName + ' ' + user.lastName"></span>
                 </div>

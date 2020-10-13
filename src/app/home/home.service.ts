@@ -16,7 +16,7 @@ export class HomeService {
         return this.httpClient.get('http://localhost:3000/api/getProfilePicture?email=' + email);
     }
 
-    getFriendsPostsByEmail(email: string): Observable<any> {
-        return this.httpClient.get('http://localhost:3000/api/getFriendsPostsByEmail?email=' + email);
+    getFriendsPostsByEmail(email: string, page: number = 1): Observable<any> {
+        return this.httpClient.get('http://localhost:3000/api/getFriendsPostsByEmail?email=' + email + '&page=' + page);
     }
 }

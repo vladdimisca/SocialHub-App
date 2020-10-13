@@ -4,20 +4,20 @@
         <br>
         <div class="flex-container">
             <ng-autocomplete
-                    [data]="allUsers"
-                    [searchKeyword]="searchKeyword"
-                    [itemTemplate]="itemTemplate"
-                    [notFoundTemplate]="notFoundTemplate"
-                    [placeHolder]="placeholder" 
-                    (selected)="startConversation($event)">                               
+                [(ngModel)]="searchString"
+                [data]="allUsers"
+                [searchKeyword]="searchKeyword"
+                [itemTemplate]="itemTemplate"
+                [notFoundTemplate]="notFoundTemplate"
+                [placeHolder]="placeholder" 
+                (selected)="startConversation($event)">                               
             </ng-autocomplete>
 
             <span class="input-group-text search_btn" ><i class="fas fa-search"></i></span>
         </div>
         
-
         <ng-template #itemTemplate let-user>
-            <div class="user">
+            <div class="user" [ngStyle]="{'display': searchString === '' ? 'none' : 'block'}">
                 <img *ngIf="user.pictureURL !== undefined" [src]="user.pictureURL" alt="user" class="rounded-circle">
                 <span [innerHTML]="user.firstName + ' ' + user.lastName"></span>
             </div>

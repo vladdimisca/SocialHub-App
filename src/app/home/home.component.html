@@ -4,7 +4,7 @@
     <div style="text-align: center;" *ngIf="posts.length === 0" class="container">
             There aren't posts to be displayed. Find more friends to see their posts.
     </div>
-    <div *ngFor="let post of posts" class="container">
+    <div (scroll)="fetchPosts()" *ngFor="let post of posts" class="container">
         <div class="row">	
             <div class="col-lg-6 offset-lg-3">
                 <div class="cardbox shadow-lg bg-white">

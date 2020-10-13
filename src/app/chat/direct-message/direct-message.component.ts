@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewEncapsulation, Output, EventEmitter } from '@angular/core';
+import { Component, OnInit, Output, EventEmitter, AfterViewInit, ViewChild, ViewChildren, QueryList, ElementRef } from '@angular/core';
 import * as io from 'socket.io-client';
 
 // interfaces
@@ -17,9 +17,11 @@ const USERS_SOCKET_ENDPOINT = 'localhost:3000/user-status';
     selector: 'app-direct-message',
     templateUrl: './direct-message.component.html',
     styleUrls: ['./direct-message.component.scss'],
-    encapsulation: ViewEncapsulation.None
 })
-export class DirectMessageComponent implements OnInit { 
+export class DirectMessageComponent implements OnInit, AfterViewInit { 
+    @ViewChild('scrollframe', {static: false}) scrollFrame: ElementRef;
+    @ViewChildren('message') messageElements: QueryList<any>;
+
     private chatSocket: io;
     private userSocket: io;
     conversation: string;
@@ -29,6 +31,8 @@ export class DirectMessageComponent implements OnInit {
     timeout: any;
     typingUser: string = '';
     onlineUsers: string[] = [];
+    messages: Message[] = [];
+    currentUser: string;
 
     @Output()
     messagesChange: EventEmitter<any> = new EventEmitter();
@@ -53,13 +57,49 @@ export class DirectMessageComponent implements OnInit {
         seen: false
     };
     
+    // view fields
+    private scrollContainer: any;
+    private isNearBottom = true;
+
     constructor(
         private route: ActivatedRoute,
         private globalService: GlobalService,
         private chatService: ChatService
     ) {}
 
+    ngAfterViewInit() {
+        this.scrollContainer = this.scrollFrame.nativeElement;
+        this.messageElements.changes.subscribe(_ => this.onMessageElementsChanged());    
+    }
+
+    onMessageElementsChanged() {
+        if (this.isNearBottom) {
+            this.scrollToBottom();
+        }
+    }
+
+    private isUserNearBottom(): boolean {
+        const threshold = 150;
+        const position = this.scrollContainer.scrollTop + this.scrollContainer.offsetHeight;
+        const height = this.scrollContainer.scrollHeight;
+
+        return position > height - threshold;
+    }
+
+    private scrollToBottom(): void {
+        this.scrollContainer.scroll({
+          top: this.scrollContainer.scrollHeight,
+          left: 0,
+          behavior: 'smooth'
+        });
+    }
+
+    scrolled(): void {
+        this.isNearBottom = this.isUserNearBottom();
+    }
+
     ngOnInit() {
+        this.currentUser = this.globalService.getCurrentUser();
         this.setup(); 
     }   
 
@@ -76,13 +116,6 @@ export class DirectMessageComponent implements OnInit {
             this.conversation = data.conversation;
             
             if(this.conversation !== 'inbox') {
-                let container = document.getElementById('msg-container');
-
-                // clear the messages' container
-                while (container.firstChild) {
-                    container.removeChild(container.firstChild);
-                }
-
                 this.chatService.getUserByUUID(data.conversation).subscribe((user: User) => {          
                     this.receiver = user;
 
@@ -108,68 +141,21 @@ export class DirectMessageComponent implements OnInit {
     }
 
     getMessages(): void {
-        this.chatService.getMessages(this.chatId).subscribe((messages: Message[]) => {   
-            const messageBody = document.getElementById('msg-container');
-            const email = this.globalService.getCurrentUser();
+        this.chatService.getMessages(this.chatId).subscribe((messages: Message[]) => { 
+            this.messages = messages;
 
-            messages.forEach(message => {
-                if(message.sender === email) {
-                    this.addSenderMessage(message);
-                } else {
-                    this.addReceiverMessage(message);
+            this.messages.forEach(message => {
+                if(message.seen === false) {
+                    message.seen = true;
+                    this.chatSocket.emit("seenMessage", this.chatId, message.messageId, message.sender, message.receiver, message.timestamp);
                 }
-                
-                messageBody.scrollTop = messageBody.scrollHeight - messageBody.clientHeight;
             });
         });  
     }
 
-    addSenderMessage(msg: Message): void {
-        this.messagesChange.emit(msg.timestamp);
-
-        let wrapperDiv = document.createElement('div');
-        wrapperDiv.className = 'd-flex justify-content-end mb-1';
-
-        let message = document.createElement('div');
-        message.className = 'msg_cotainer_send';
-        message.innerHTML = msg.message;
-        message.id = msg.messageId;
-
-        if(msg.seen === true) {
-            message.style.backgroundColor = 'rgb(153, 214, 255)';
-        }
-
-        let msgTime = document.createElement('span');
-        msgTime.className = 'msg_time_send text-right';
-        msgTime.style.width = '150px';
-        msgTime.innerHTML = this.getDateAgo(msg.timestamp);
-        msgTime.style.display = 'none';
-
-        message.onclick = (event: any) => {
-            if(event.target.tagName.toLowerCase() === 'span') {
-               return; 
-            }
-
-            if(msgTime.style.display === 'none') {
-                msgTime.style.display = 'block';
-                wrapperDiv.classList.remove("mb-1");
-                wrapperDiv.className += " mb-4";
-            } else {
-                msgTime.style.display = 'none';
-                wrapperDiv.classList.remove("mb-4");
-                wrapperDiv.className += " mb-1";
-            } 
-        }
-        
-        setInterval(() => {
-            msgTime.innerHTML = this.getDateAgo(msg.timestamp);
-        }, 5000);
-
-        message.appendChild(msgTime);
-        wrapperDiv.appendChild(message);
-
-        let msgContainer = document.getElementById('msg-container');
-        msgContainer.appendChild(wrapperDiv);
+    addSenderMessage(message: Message): void {
+        this.messagesChange.emit(message.timestamp);
+        this.messages.push(message);
     }
 
     addReceiverMessage(message: Message): void {
@@ -179,55 +165,29 @@ export class DirectMessageComponent implements OnInit {
         }
 
         this.messagesChange.emit(message.timestamp);
+        this.messages.push(message);
+    }
 
-        let wrapperDiv = document.createElement('div');
-        wrapperDiv.className = "d-flex justify-content-start mb-1";
+    handleDate(event: any): void {
+        const element = event.target;
 
-        let imageDiv = document.createElement('div');
-        imageDiv.className = 'img_cont_msg';
-
-        let img = document.createElement('img');
-        img.className = 'rounded-circle user_img_msg';
-        img.src = this.receiver?.pictureURL;
-
-        let messageDiv = document.createElement('div');
-        messageDiv.className = 'msg_cotainer';
-        messageDiv.innerHTML = message.message;
-        messageDiv.id = message.messageId;
-                
-        let msgTimeSent = document.createElement('span');
-        msgTimeSent.className = 'msg_time';
-        msgTimeSent.style.width = '150px';
-        msgTimeSent.innerHTML = this.getDateAgo(message.timestamp);
-        msgTimeSent.style.display = 'none';
-
-        messageDiv.onclick = (event: any) => {
-            if(event.target.tagName.toLowerCase() === 'span') {
-               return; 
-            }
-
-            if(msgTimeSent.style.display === 'none') {
-                msgTimeSent.style.display = 'block';
-                wrapperDiv.classList.remove("mb-1");
-                wrapperDiv.className += " mb-4";
-            } else {
-                msgTimeSent.style.display = 'none';
-                wrapperDiv.classList.remove("mb-4");
-                wrapperDiv.className += " mb-1";
-            } 
+        if(element.tagName.toLowerCase() === 'span') {
+           return; 
         }
         
-        setInterval(() => {
-            msgTimeSent.innerHTML = this.getDateAgo(message.timestamp);
-        }, 5000);
-                
-        messageDiv.appendChild(msgTimeSent);
-        imageDiv.appendChild(img);
-        wrapperDiv.appendChild(imageDiv);
-        wrapperDiv.appendChild(messageDiv);
+        const timeSpan = element.getElementsByTagName('span')[0];
 
-        let msgContainer = document.getElementById('msg-container');
-        msgContainer.appendChild(wrapperDiv);
+        if(timeSpan.classList.contains('not-displayed')) {
+            timeSpan.classList.remove('not-displayed');
+            timeSpan.className += ' displayed';
+            element.classList.remove("mb-1");
+            element.className += " mb-4";
+        } else {
+            timeSpan.classList.remove('displayed');
+            timeSpan.className += ' not-displayed';
+            element.classList.remove("mb-4");
+            element.className += " mb-1";
+        } 
     }
 
     stopTyping(): void {
@@ -265,22 +225,11 @@ export class DirectMessageComponent implements OnInit {
         this.chatSocket.on('message-broadcast', (message: Message) => {
             this.messagesChange.emit(message.timestamp);
 
-            const messageBody = document.getElementById('msg-container');
-            let notScrolled = false;
-
             if (message !== undefined) {
                 if(message.sender === this.globalService.getCurrentUser()) {
                     this.addSenderMessage(message);
                 } else {
-                    if(messageBody.scrollTop + 200 < messageBody.scrollHeight - messageBody.clientHeight) {
-                        notScrolled = true;
-                    }
-
                     this.addReceiverMessage(message);
-                }
-                
-                if(notScrolled === false) {
-                    messageBody.scrollTop = messageBody.scrollHeight - messageBody.clientHeight;
                 }
             }
         });
@@ -296,8 +245,11 @@ export class DirectMessageComponent implements OnInit {
         });
 
         this.chatSocket.on('seen', (messageId: string) => {
-            const message = document.getElementById(messageId);
-            message.style.backgroundColor = 'rgb(153, 214, 255)';
+            this.messages.forEach(message => {
+                if(message.messageId === messageId) {
+                    message.seen = true;
+                }
+            });
         });
 
         // users socket
@@ -340,48 +292,6 @@ export class DirectMessageComponent implements OnInit {
         this.message.timestamp = date.getTime();
                 
         this.chatSocket.emit('message', this.message);
-
-        const messageBody = document.getElementById('msg-container');
-        messageBody.scrollTop = messageBody.scrollHeight - messageBody.clientHeight;
-
         this.messageText = '';
-    }
-
-    getDateAgo(timestamp: number): string {
-        let result: string;
-        let now = new Date().getTime(); // current time
-        let delta = (now - timestamp) / 1000; // time since message was sent in seconds
-
-        if (delta < 45) {
-            result = 'Just now';
-        } else 
-            if (delta < 60) { // sent in last minute
-            result = Math.floor(delta) + ' seconds ago';
-            } else 
-                if (delta < 3600) { // sent in last hour
-                    if(Math.floor(delta / 60) === 1) {
-                        result = Math.floor(delta / 60) + ' minute ago';
-                    } else {
-                        result = Math.floor(delta / 60) + ' minutes ago';
-                    }
-                } else
-                    if (delta < 86400) { // sent on last day
-                        if(Math.floor(delta / 3600) === 1) {
-                            result = Math.floor(delta / 3600) + ' hour ago';
-                        } else {
-                            result = Math.floor(delta / 3600) + ' hours ago';
-                        }
-                    } else 
-                        if (delta < 3 * 86400) { // sent on last 3 days
-                            if(Math.floor(delta / 86400) === 1) {
-                                result = Math.floor(delta / 86400) + ' day ago';
-                            } else {
-                                result = Math.floor(delta / 86400) + ' days ago';
-                            }
-                        } else { // sent more than three days ago
-                            result = new Date(timestamp).toLocaleDateString(undefined, { day: 'numeric', month: 'long', year: 'numeric' }) + ' at ' +
-                                        new Date(timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-                        }
-        return result;
     }
 }

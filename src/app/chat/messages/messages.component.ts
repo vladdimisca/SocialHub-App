@@ -35,6 +35,7 @@ export class MessagesComponent implements OnInit, OnChanges {
     searchKeyword: string = 'fullName';
     placeholder: string = 'Search...';
     notFoundMessage: string = 'No results...';
+    searchString: string = '';
 
     constructor(
         private router: Router,

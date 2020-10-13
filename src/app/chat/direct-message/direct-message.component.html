@@ -16,9 +16,35 @@
         </div>
     </div>
     
-    <div class="card-body msg_card_body" id="msg-container">
+    <div class="card-body msg_card_body" id="msg-container" (scroll)="scrolled()" #scrollframe>
         <div *ngIf="conversation === 'inbox'"> 
             <h4> Start a new conversation</h4> 
+        </div>
+
+        <div *ngFor="let message of messages" #message>
+            <!-- sender message -->
+            <div *ngIf="currentUser === message.sender" class='d-flex justify-content-end mb-1'>
+                <div class="msg_cotainer_send" [ngClass]="{'seen': message.seen === true}" (click)="handleDate($event)"> 
+                    {{ message.message }}
+                    <span class="msg_time_send text-right not-displayed" style="width: 150px;">
+                         {{ message.timestamp | dateAgo }} 
+                    </span>
+                </div>
+            </div>
+
+            <!-- receiver message -->
+            <div *ngIf="currentUser === message.receiver" class='d-flex justify-content-start mb-1'>
+                <div class='img_cont_msg'>
+                    <img class='rounded-circle user_img_msg' *ngIf="receiver.pictureURL !== undefined" [src]="receiver.pictureURL" alt="profile">
+                </div>
+                
+                <div class="msg_cotainer" (click)="handleDate($event)"> 
+                    {{ message.message }}
+                    <span class="msg_time not-displayed" style="width: 150px;">
+                         {{ message.timestamp | dateAgo }} 
+                    </span>
+                </div>
+            </div>
         </div>
     </div>
 

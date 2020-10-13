@@ -24,13 +24,13 @@ export class NavbarComponent implements OnInit {
     
     userProfileLink: string;
     existingUser: boolean;
-    searchString: string = '';
 
     // autocomplete
     users: User[] = [];
     searchKeyword: string = 'fullName';
     placeholder: string = 'Search...';
     notFoundMessage: string = 'No results...';
+    searchString: string = '';
 
     constructor(
         private globalService: GlobalService,
@@ -69,10 +69,6 @@ export class NavbarComponent implements OnInit {
         
         this.globalService.removeCurrentUser();
         this.globalService.removeToken();
-    }
-
-    changeInput(value: string) {
-        this.searchString = value;
     }
 
     openProfile(user: User): void {
