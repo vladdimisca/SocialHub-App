@@ -34,6 +34,10 @@ export class DirectMessageComponent implements OnInit, AfterViewInit {
     messages: Message[] = [];
     currentUser: string;
 
+    // file attach
+    uploadTimestamp: number;
+    uploadedFile: any;
+
     @Output()
     messagesChange: EventEmitter<any> = new EventEmitter();
 
@@ -293,5 +297,25 @@ export class DirectMessageComponent implements OnInit, AfterViewInit {
                 
         this.chatSocket.emit('message', this.message);
         this.messageText = '';
+    }
+
+    attachFile(event: any): void {
+        let file = event.target.files[0];
+        let reader = new FileReader();
+
+        reader.onloadend = () => {
+            const date = new Date();
+
+            this.uploadTimestamp = date.getTime();
+            this.uploadedFile = reader.result;
+
+            if(!this.uploadedFile) {
+                return;
+            }
+
+            console.log(file.name)
+        }; 
+
+        reader.readAsDataURL(file);
     }
 }

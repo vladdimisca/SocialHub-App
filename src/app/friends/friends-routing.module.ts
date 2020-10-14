@@ -4,6 +4,7 @@ import { Routes, RouterModule } from '@angular/router';
 // components
 import { FriendRequestsComponent } from './friend-requests/friend-requests.component';
 import { FriendsListComponent } from './friends-list/friends-list.component';
+import { GeneralFriendsListComponent } from './general-friends-list/general-friends-list.component';
 
 // guards
 import { AuthGuard } from '../utils/guards/auth.guard';
@@ -18,6 +19,12 @@ const routes: Routes = [
     {
       path: 'friends-list', 
       component: FriendsListComponent, 
+      canActivate: [AuthGuard],
+      data: {title: 'Friends List'}
+    },
+    {
+      path: ':user',
+      component: GeneralFriendsListComponent,
       canActivate: [AuthGuard],
       data: {title: 'Friends List'}
     }

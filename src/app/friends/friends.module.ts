@@ -9,6 +9,7 @@ import { NavbarModule } from '../navbar/navbar.module';
 // components
 import { FriendRequestsComponent } from './friend-requests/friend-requests.component';
 import { FriendsListComponent } from './friends-list/friends-list.component';
+import { GeneralFriendsListComponent } from './general-friends-list/general-friends-list.component';
 
 // services
 import { GlobalService } from '../utils/global.service';
@@ -21,7 +22,8 @@ import { ErrorInterceptor } from '../utils/interceptors/error.interceptor';
 @NgModule({
     declarations: [
         FriendRequestsComponent,
-        FriendsListComponent
+        FriendsListComponent,
+        GeneralFriendsListComponent
     ],
     imports: [
         CommonModule,

@@ -4,8 +4,6 @@ import { Router, CanActivate, ActivatedRouteSnapshot, RouterStateSnapshot } from
 // services
 import { GlobalService } from '../global.service';
 
-
-
 @Injectable({
      providedIn: 'root' 
 })

@@ -1,0 +1,38 @@
+<app-navbar [navLinks]="true"></app-navbar>
+
+<section class="hero">
+    <div class="container">
+        {{ displayedUser.firstName + ' ' + displayedUser.lastName }}
+        <div class="row">	
+            <div class="col-lg-6 offset-lg-3">
+                <button class="activeButton" disabled>Friends</button>
+
+                <div class="cardbox shadow-lg bg-white" >
+                    <div *ngIf="friends.length === 0" class="nearby-user centered">
+                        {{ displayedUser.firstName }} doesn't have any friends.
+                    </div>
+                    <div *ngFor="let friend of friends">
+                      <div class="nearby-user" >
+                          <div class="row">
+                            <div *ngIf="friend.pictureURL !== undefined" class="col1">
+                              <a [href]="'profile/' + friend.email"><img [src]="friend.pictureURL" alt="user" class="img-fluid rounded-circle"></a>
+                            </div>
+                            <div *ngIf="friend.description !== undefined" class="col2">
+                              <h5><a [href]="'profile/' + friend.email" class="profile-link">{{ friend.firstName + ' ' + friend.lastName }}</a></h5>
+                              <p *ngIf="friend.description.length > 26">{{ friend.description | slice:0:23 }}...</p> 
+                              <p *ngIf="friend.description.length < 26">{{ friend.description }}</p>
+                            </div>
+                            <div class="col3">
+                              <button class="btn btn-danger" style="margin-right: 10px;" (click)="removeFriend(friend.email)">Remove</button>
+                              <button type="button" class="btn btn-info" (click)="openConversation(friend.uuid)">Message</button>
+                            </div>
+                          </div>
+                      </div>
+                      <hr>
+                    </div>                       
+                </div><!--/ cardbox -->
+
+            </div><!--/ col-lg-6 -->	               
+        </div><!--/ row -->
+    </div><!--/ container -->
+</section>       

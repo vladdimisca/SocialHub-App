@@ -190,6 +190,11 @@ position: relative;
     background-color: rgb(153, 214, 255);
 }
 
+.fill-parent {
+    width: 100%;
+    height: 100%;
+}
+
 @media(max-width: 780px) {
     body, html{
         overflow-y: scroll;
