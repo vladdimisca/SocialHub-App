@@ -4,6 +4,7 @@ import { NgModule } from '@angular/core';
 import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 import { NavbarModule } from '../navbar/navbar.module';
 import { HomeRoutingModule } from './home-routing.module';
+import { FormsModule } from '@angular/forms';
 
 // pipes
 import { DateAgoModule } from '../utils/date-ago/date-ago.module';
@@ -28,7 +29,8 @@ import { ErrorInterceptor } from '../utils/interceptors/error.interceptor';
     HttpClientModule,
     NavbarModule,
     HomeRoutingModule,
-    DateAgoModule
+    DateAgoModule,
+    FormsModule
   ],
   exports: [],
   providers: [

@@ -45,51 +45,42 @@
                             <li><a><span>242 Likes</span></a></li>
                         </ul>			   
                     </div>
-        <!--
-                    <div class="social-footer">
+        
+                    <div class="social-footer" *ngFor="let comment of mapCommentsToPosts.get(post.postId)">
                         <div class="social-comment">
                             <span class="comment-avatar float-left" style="margin-top: 10px;">
                                 <a href=""><img class="rounded-circle" src="http://www.themashabrand.com/templates/bootsnipp/post/assets/img/users/6.jpg" alt="..."></a>                            
                             </span>
                             <div class="media-body">
                                 <a href="#">
-                                    Andrew Williams
+                                    {{ comment.senderEmail }}
                                 </a>
                                 <br>
-                                Internet tend to repeat predefined chunks as necessary
+                                {{ comment.text }}
                                 <br>
-                                <small class="text-muted">12.06.2014</small>
+                                <small class="text-muted">{{ comment.timestamp | dateAgo }}</small>
                             </div>
                     </div>
 
                     <hr>
-
-                    <div class="social-comment">
-                        <span class="comment-avatar float-left" style="margin-top: 10px;">
-                            <a href=""><img class="rounded-circle" src="http://www.themashabrand.com/templates/bootsnipp/post/assets/img/users/6.jpg" alt="..."></a>                            
-                        </span>
-                        <div class="media-body">
-                            <a href="#">
-                                Andrew Williams
-                            </a>
-
-                            <br>
-                            Making this the first true generator on the Internet. It uses a dictionary of over 200 Latin words.
-                            <br>
-                            <small class="text-muted">12.06.2014</small>
-                        </div>
-                    </div>
                 </div>
-            -->
+            
         <div class="social-footer">
            <div class="social-comment" style="display: flex;">
                <span class="comment-avatar float-left" style="margin-top: 10px;">
                    <a href=""><img class="rounded-circle" src="http://www.themashabrand.com/templates/bootsnipp/post/assets/img/users/6.jpg" alt="..."></a>                            
                   </span>
                <div class="media-body">
-                   <textarea class="form-control" placeholder="Write comment..."></textarea>
+                   <textarea 
+                        class="form-control" 
+                        (keyup.enter)="addComment($event, post.postId)" 
+                        name="comment" 
+                        [ngModel]="mapNewCommentToPost.get(post.postId)"
+                        (ngModelChange)="mapNewCommentToPost.set(post.postId, $event)" 
+                        placeholder="Write comment..." >
+                    </textarea>
                </div>
-               <button class="btn" style="background-color: rgb(69, 0, 61); color:white; border-color:rgb(69, 0, 61); margin-top: 10px; margin-bottom: 10px;"> Post</button>
+               <button class="btn" (click)="addComment($event, post.postId)" style="background-color: rgb(69, 0, 61); color:white; border-color:rgb(69, 0, 61); margin-top: 10px; margin-bottom: 10px;"> Post</button>
            </div>
        </div>		       
        </div>
