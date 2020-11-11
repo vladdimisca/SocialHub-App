@@ -27,4 +27,12 @@ export class FriendsService {
     getUserByEmail(email: string): Observable<any> {
         return this.httpClient.get('http://localhost:3000/api/getUserByEmail?email=' + email);
     }
+
+    checkFriendshipStatus(user: string, userToCheck: string): Observable<any> {
+        return this.httpClient.get('http://localhost:3000/api/checkFriendshipStatus?user=' + user + '&userToCheck=' + userToCheck);
+    }
+
+    getNumberOfFriendsByEmail(email: string): Observable<any> {
+        return this.httpClient.get('http://localhost:3000/api/getNumberOfFriendsByEmail?email=' + email);
+    }
 }

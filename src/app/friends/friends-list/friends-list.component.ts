@@ -29,7 +29,7 @@ export class FriendsListComponent implements OnInit {
 
     ngOnInit() {
         this.currentUser = this.globalService.getCurrentUser();
-
+        
         this.setupSocketConnection();
 
         this.friendsService.getFriendsByEmail(this.currentUser).subscribe((friends: User[]) => {
@@ -66,38 +66,44 @@ export class FriendsListComponent implements OnInit {
             this.friendsSocket.emit('join', this.currentUser);
         });
 
-        this.friendsSocket.on('unfriendSent', (receiver: string) => {
-            this.friends = this.friends.filter(user => user.email !== receiver);
+        this.friendsSocket.on('unfriendSent', (sender: string, receiver: string) => {
+            if(sender === this.currentUser && this.friends.map(user => user.email).includes(receiver)) {
+                this.friends = this.friends.filter(user => user.email !== receiver);
+            }
         });
 
-        this.friendsSocket.on('unfriendReceived', (sender: string) => {
-            this.friends = this.friends.filter(user => user.email !== sender);
+        this.friendsSocket.on('unfriendReceived', (sender: string, receiver: string) => {
+            if(this.friends.map(user => user.email).includes(sender) && receiver === this.currentUser) {
+                this.friends = this.friends.filter(user => user.email !== sender);
+            } 
         });
 
-        this.friendsSocket.on('requestAccepted', (sender: string) => {
-            this.friendsService.getUserByEmail(sender).subscribe((user: User) => {
-                const friend: User = {
-                    uuid: user.uuid,
-                    email: user.email,
-                    firstName: user.firstName,
-                    lastName: user.lastName,
-                    description: '',
-                    pictureURL: undefined,
-                    fullName: undefined
+        this.friendsSocket.on('requestAccepted', (sender: string, receiver: string) => {
+            if(this.friends.map(user => user.email).includes(sender) && receiver === this.currentUser) {
+                this.pushFriend(sender);
+            } else 
+                if(sender === this.currentUser && this.friends.map(user => user.email).includes(receiver)) {
+                    this.pushFriend(receiver);
+                }
+        });
+    }
+
+    pushFriend(newFriend: string): void {
+        this.friendsService.getUserByEmail(newFriend).subscribe((user: User) => {
+            const friend: User = user;
+            friend.description = '';
+
+            this.friendsService.getProfileImage(user.email).subscribe((pictureURL: string) => {
+                if(pictureURL === null) {
+                    friend.pictureURL = "assets/images/blank.jpg";
+                } else {
+                    friend.pictureURL = pictureURL;
                 }
 
-                this.friendsService.getProfileImage(user.email).subscribe((pictureURL: string) => {
-                    if(pictureURL === null) {
-                        friend.pictureURL = "assets/images/blank.jpg";
-                    } else {
-                        friend.pictureURL = pictureURL;
-                    }
+                this.friendsService.getDescription(user.email).subscribe((description: string) => {
+                    friend.description = description;
 
-                    this.friendsService.getDescription(user.email).subscribe((description: string) => {
-                        friend.description = description;
-
-                        this.friends.push(friend);
-                    });
+                    this.friends.push(friend);
                 });
             });
         });

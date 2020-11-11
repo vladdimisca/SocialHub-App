@@ -97,34 +97,50 @@ export class DetailsComponent implements OnInit {
             this.friendsSocket.emit('join', this.currentUser);
         });
 
-        this.friendsSocket.on('requestReceived', () => {
-            this.friendshipStatus = 'received-request';
+        this.friendsSocket.on('requestReceived', (sender: string, receiver: string) => {
+            if(sender === this.displayedUser.email && receiver === this.currentUser) {
+                this.friendshipStatus = 'received-request';
+            } 
         });
 
-        this.friendsSocket.on('requestSent', () => {
-            this.friendshipStatus = 'sent-request'
+        this.friendsSocket.on('requestSent', (sender: string, receiver: string) => {
+            if(sender === this.currentUser && receiver === this.displayedUser.email) {
+                this.friendshipStatus = 'sent-request';
+            }
         });
 
-        this.friendsSocket.on('requestAccepted', () => {
-            this.friendshipStatus = 'friends';
-            this.numberOfFriends++;
+        this.friendsSocket.on('requestAccepted', (sender: string, receiver: string) => {
+            if((sender === this.currentUser && receiver === this.displayedUser.email) || (sender === this.displayedUser.email && receiver === this.currentUser)) {
+                this.friendshipStatus = 'friends';
+                this.numberOfFriends++;
+            }
+            
         });
         
-        this.friendsSocket.on('unfriendSent', () => {
-            this.friendshipStatus = 'none';
-            this.numberOfFriends--;
+        this.friendsSocket.on('unfriendSent', (sender: string, receiver: string) => {
+            if(sender === this.currentUser && receiver === this.displayedUser.email) {
+                this.friendshipStatus = 'none';
+                this.numberOfFriends--;
+            }
         });
 
-        this.friendsSocket.on('unfriendReceived', () => {
-            this.friendshipStatus = 'none';
+        this.friendsSocket.on('unfriendReceived', (sender: string, receiver: string) => {
+            if(sender === this.displayedUser.email && receiver === this.currentUser) {
+                this.friendshipStatus = 'none';
+                this.numberOfFriends--;
+            }
         });
 
-        this.friendsSocket.on('requestUnsent', () => {
-            this.friendshipStatus = 'none';
+        this.friendsSocket.on('requestUnsent', (sender: string, receiver: string) => {
+            if(sender === this.currentUser && receiver === this.displayedUser.email) {
+                this.friendshipStatus = 'none';
+            }  
         });
 
-        this.friendsSocket.on('requestWithdrawn', () => {
-            this.friendshipStatus = 'none';
+        this.friendsSocket.on('requestWithdrawn', (sender: string, receiver: string) => {
+            if(sender === this.displayedUser.email && receiver === this.currentUser) {
+                this.friendshipStatus = 'none';
+            }
         });
     }
 
@@ -166,7 +182,7 @@ export class DetailsComponent implements OnInit {
     }
 
     acceptRequest(): void {
-        this.friendsSocket.emit('acceptRequest', this.currentUser , this.displayedUser.email);
+        this.friendsSocket.emit('acceptRequest', this.currentUser, this.displayedUser.email);
     }
 
     removeFriend(): void {

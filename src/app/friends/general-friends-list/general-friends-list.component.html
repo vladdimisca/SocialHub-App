@@ -2,19 +2,36 @@
 
 <section class="hero">
     <div class="container">
-        {{ displayedUser.firstName + ' ' + displayedUser.lastName }}
+        <div class="row">
+          <div class="col-lg-6 offset-lg-3 custom-style">
+            <div class="column">     
+              <div class="picture-container">
+                  <div class="picture">
+                      <img *ngIf="displayedUser?.pictureURL" [src]='displayedUser?.pictureURL' alt="profile photo"class="rounded-circle profile-photo" id="wizardPicturePreview" >
+                  </div>            
+              </div> 
+            </div>
+
+            <div class="column">
+              <h2 *ngIf="displayedUser">{{ displayedUser.firstName + " " + displayedUser.lastName }}</h2>
+              <p><strong>About: </strong> {{ displayedUser?.description }} </p>
+              <h3><strong> Friends: </strong>{{ numberOfFriends }} </h3>
+            </div> 
+          </div>
+        </div>
+
         <div class="row">	
             <div class="col-lg-6 offset-lg-3">
                 <button class="activeButton" disabled>Friends</button>
 
                 <div class="cardbox shadow-lg bg-white" >
                     <div *ngIf="friends.length === 0" class="nearby-user centered">
-                        {{ displayedUser.firstName }} doesn't have any friends.
+                        {{ displayedUser?.firstName }} doesn't have any friends.
                     </div>
                     <div *ngFor="let friend of friends">
                       <div class="nearby-user" >
                           <div class="row">
-                            <div *ngIf="friend.pictureURL !== undefined" class="col1">
+                            <div *ngIf="friend.pictureURL" class="col1">
                               <a [href]="'profile/' + friend.email"><img [src]="friend.pictureURL" alt="user" class="img-fluid rounded-circle"></a>
                             </div>
                             <div *ngIf="friend.description !== undefined" class="col2">
@@ -22,9 +39,42 @@
                               <p *ngIf="friend.description.length > 26">{{ friend.description | slice:0:23 }}...</p> 
                               <p *ngIf="friend.description.length < 26">{{ friend.description }}</p>
                             </div>
-                            <div class="col3">
-                              <button class="btn btn-danger" style="margin-right: 10px;" (click)="removeFriend(friend.email)">Remove</button>
-                              <button type="button" class="btn btn-info" (click)="openConversation(friend.uuid)">Message</button>
+
+                            <div *ngIf="friendshipStatus.get(friend.email) === 'friends'" class="col3">
+                              <button class="btn btn-danger resized" style="margin-right: 10px;" (click)="removeFriend(friend.email)">
+                                Remove
+                              </button>
+                              <button type="button" class="btn btn-info" (click)="openConversation(friend.uuid)">
+                                Message
+                              </button>
+                            </div>
+
+                            <div *ngIf="friendshipStatus.get(friend.email) === 'none' && currentUser !== friend.email" class="col3">
+                              <button class="btn btn-success resized" style="margin-right: 10px;" (click)="addFriend(friend.email)">
+                                Add Friend
+                              </button>
+                              <button type="button" class="btn btn-info" (click)="openConversation(friend.uuid)">
+                                Message
+                              </button>
+                            </div>
+
+                            <div *ngIf="friendshipStatus.get(friend.email) === 'sent-request'" class="col3">
+                              <button class="btn btn-success resized" style="margin-right: 10px;" (click)="unsendRequest(friend.email)">
+                                 Unsend 
+                              </button>
+                              <button type="button" class="btn btn-info" (click)="openConversation(friend.uuid)">
+                                Message
+                              </button>
+                            </div>
+
+                            <div *ngIf="friendshipStatus.get(friend.email) === 'received-request'" class="col3">
+                              <button class="btn btn-success resized" style="margin-right: 10px;" (click)="acceptRequest(friend.email)">
+                                Accept
+                              </button>
+
+                              <button class="btn btn-danger" style="width: 88.24px;" (click)="rejectRequest(friend.email)">
+                                Reject 
+                              </button>
                             </div>
                           </div>
                       </div>

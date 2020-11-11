@@ -23,4 +23,8 @@ export class HomeService {
     getCommentsByPostId(postId: string): Observable<any> {
         return this.httpClient.get('http://localhost:3000/api/getCommentsByPostId?postId=' + postId);
     }
+    
+    getLikesByPostId(postId: string): Observable<any> {
+        return this.httpClient.get('http://localhost:3000/api/getLikesByPostId?postId=' + postId);
+    }
 }
