@@ -60,40 +60,41 @@ export class FriendRequestsComponent implements OnInit {
             this.friendsSocket.emit('join', this.currentUser);
         });
 
-        this.friendsSocket.on('requestAccepted', (receiver: string) => {
-            this.friendRequests = this.friendRequests.filter(friendRequest => friendRequest.email !== receiver);
+        this.friendsSocket.on('requestAccepted', (sender: string, receiver: string) => {
+            if(sender === this.currentUser && this.friendRequests.map(user => user.email).includes(receiver)) {
+                this.friendRequests = this.friendRequests.filter(friendRequest => friendRequest.email !== receiver);
+            } else 
+                if(this.friendRequests.map(user => user.email).includes(sender) && receiver === this.currentUser) {
+                    this.friendRequests = this.friendRequests.filter(friendRequest => friendRequest.email !== sender)
+                }   
         });
 
-        this.friendsSocket.on('requestWithdrawn', (receiver: string) => {
-            this.friendRequests = this.friendRequests.filter(friendRequest => friendRequest.email !== receiver);
+        this.friendsSocket.on('requestWithdrawn', (sender: string, receiver: string) => {
+            if(this.friendRequests.map(user => user.email).includes(sender) && receiver === this.currentUser) {
+                this.friendRequests = this.friendRequests.filter(friendRequest => friendRequest.email !== sender);
+            }
         });
 
-        this.friendsSocket.on('requestReceived', (sender: string) => {
-            this.friendsService.getUserByEmail(sender).subscribe((user: User) => {
-                const friend: User = {
-                    uuid: user.uuid,
-                    email: user.email,
-                    firstName: user.firstName,
-                    lastName: user.lastName,
-                    description: '',
-                    pictureURL: undefined,
-                    fullName: undefined
-                }
-
-                this.friendsService.getProfileImage(user.email).subscribe((pictureURL: string) => {
-                    if(pictureURL === null) {
-                        friend.pictureURL = "assets/images/blank.jpg";
-                    } else {
-                        friend.pictureURL = pictureURL;
-                    }
-
-                    this.friendsService.getDescription(user.email).subscribe((description: string) => {
-                        friend.description = description;
-
-                        this.friendRequests.push(friend);
+        this.friendsSocket.on('requestReceived', (sender: string, receiver: string) => {
+            if(receiver === this.currentUser) {
+                this.friendsService.getUserByEmail(sender).subscribe((user: User) => {
+                    const friend: User = user;
+                    friend.description = '';
+    
+                    this.friendsService.getProfileImage(user.email).subscribe((pictureURL: string) => {
+                        if(pictureURL === null) {
+                            friend.pictureURL = "assets/images/blank.jpg";
+                        } else {
+                            friend.pictureURL = pictureURL;
+                        }
+    
+                        this.friendsService.getDescription(user.email).subscribe((description: string) => {
+                            friend.description = description;
+                            this.friendRequests.push(friend);
+                        });
                     });
                 });
-            });
+            }
         });
     }
 

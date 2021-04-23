@@ -28,10 +28,15 @@ export class SettingsComponent implements OnInit {
     firstName: string = '';
     lastName: string = '';
     description: string = '';
+    password: string = '';
+    confirmPassword: string = '';
 
     // check validators
     profileUpdated: boolean = false;
+    passwordUpdated: boolean = false;
     updateError: boolean = false;
+    updateErrorPassword: boolean = false;
+    errorMessage: string = '';
     updateTimeout: any;
 
     constructor ( 
@@ -103,4 +108,53 @@ export class SettingsComponent implements OnInit {
         
     }
 
+    changePassword(): void {
+        if(this.password.length < 4 || this.confirmPassword.length < 4) {
+            this.updateErrorPassword = true;
+            this.errorMessage = "Password lenght has to be bigger than 4 characters!"
+
+            console.log(this.updateErrorPassword, this.errorMessage);
+
+            if(this.updateTimeout) {
+                clearTimeout(this.updateTimeout);
+            }
+
+            this.updateTimeout = setTimeout(() => {  
+                this.updateErrorPassword = false;
+            }, 2000);
+
+        } else {
+            if(this.password !== this.confirmPassword) {
+                this.errorMessage = "Confirmed password does not match!";
+                this.updateErrorPassword = true;
+
+                
+                if(this.updateTimeout) {
+                    clearTimeout(this.updateTimeout);
+                }
+
+                this.updateTimeout = setTimeout(() => {  
+                    this.updateErrorPassword = false;
+                }, 2000);
+
+                
+            console.log(this.updateErrorPassword, this.errorMessage);
+            }
+            else {
+                this.profileService.changePassword(this.currentUser.uuid, this.password)
+                .subscribe(() => {
+                
+                    if(this.updateTimeout) {
+                        clearTimeout(this.updateTimeout);
+                    }
+
+                    this.passwordUpdated = true;
+
+                    this.updateTimeout = setTimeout(() => {  
+                        this.passwordUpdated = false;
+                    }, 2000);
+                });
+            }
+        }
+    }
 }

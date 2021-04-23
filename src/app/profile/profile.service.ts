@@ -53,4 +53,19 @@ export class ProfileService {
     getDescription(email: string): Observable<any> {
         return this.httpClient.get('http://localhost:3000/api/getDescriptionByEmail?email=' + email);
     }
+
+    getCommentsByPostId(postId: string): Observable<any> {
+        return this.httpClient.get('http://localhost:3000/api/getCommentsByPostId?postId=' + postId);
+    }
+
+    getLikesByPostId(postId: string): Observable<any> {
+        return this.httpClient.get('http://localhost:3000/api/getLikesByPostId?postId=' + postId);
+    }
+    
+    changePassword(uuid: string, password: string): Observable<any> {
+        return this.httpClient.put('http://localhost:3000/api/changePassword', {
+            uuid: uuid, 
+            password: password
+        });
+    }
 }

@@ -38,58 +38,53 @@
                     <div class="cardbox-base">
                         <ul class="float-right">
                             <li><a><i class="fa fa-comments" ></i></a></li>
-                            <li><a><em class="mr-5">2</em></a></li>
+                            <li>
+                                <a>
+                                    <em *ngIf="mapCommentsToPosts.get(post.postId) !== undefined" class="mr-5"> {{ mapCommentsToPosts.get(post.postId).length }} </em>
+                                </a>
+                            </li>
                         </ul>
                         <ul>
-                            <li><button class="btn" style="background-color: rgb(69, 0, 61); color:white; border-color:rgb(69, 0, 61);" ><i class="fa fa-thumbs-up" > Like</i></button></li>
-                            <li><a><span>242 Likes</span></a></li>
+                            <li><button class="btn" (click)="addLike(post.postId)" style="background-color: rgb(69, 0, 61); color:white; border-color:rgb(69, 0, 61);" value="Like"><i [ngClass]="this.mapIconToPost.get(post.postId)" > </i></button></li>
+                            <li><a><span *ngIf="mapUsersToLikes.get(post.postId) !== undefined"> {{ this.mapUsersToLikes.get(post.postId).length }} Likes</span></a></li>
                         </ul>			   
                     </div>
-        <!--
-                    <div class="social-footer">
-                        <div class="social-comment">
-                            <span class="comment-avatar float-left" style="margin-top: 10px;">
-                                <a href=""><img class="rounded-circle" src="http://www.themashabrand.com/templates/bootsnipp/post/assets/img/users/6.jpg" alt="..."></a>                            
+        
+                    <div class="social-footer" *ngFor="let comment of mapCommentsToPosts.get(post.postId)">
+                        <div style="padding: 10px;" class="social-comment">
+                            <span class="comment-avatar float-left" style="margin-top: 10px; padding-right: 10px;">
+                                <a href="'profile/' + comment.senderEmail"><img *ngIf="mapUserToComment.get(comment.commentId) !== undefined" class="img-fluid rounded-circle" [src]="mapUserToComment.get(comment.commentId).pictureURL" alt="..."></a>                            
                             </span>
                             <div class="media-body">
-                                <a href="#">
-                                    Andrew Williams
+                                <a *ngIf="mapUserToComment.get(comment.commentId) !== undefined" [href]="'profile/' + comment.senderEmail" class="name">
+                                    {{ mapUserToComment.get(comment.commentId).firstName }}
+                                    {{ mapUserToComment.get(comment.commentId).lastName }}
                                 </a>
+                                <div *ngIf="mapUserToComment.get(comment.commentId) !== undefined" (click)="deleteComment(comment.commentId, comment.postId)" href="#" class="del_photo" id=""><i *ngIf="mapUserToComment.get(comment.commentId).email === currentUserEmail" class="fas fa-times"></i></div>
                                 <br>
-                                Internet tend to repeat predefined chunks as necessary
+                                {{ comment.text }}
                                 <br>
-                                <small class="text-muted">12.06.2014</small>
+                                <small class="text-muted">{{ comment.timestamp | dateAgo }}</small>
                             </div>
                     </div>
-
-                    <hr>
-
-                    <div class="social-comment">
-                        <span class="comment-avatar float-left" style="margin-top: 10px;">
-                            <a href=""><img class="rounded-circle" src="http://www.themashabrand.com/templates/bootsnipp/post/assets/img/users/6.jpg" alt="..."></a>                            
-                        </span>
-                        <div class="media-body">
-                            <a href="#">
-                                Andrew Williams
-                            </a>
-
-                            <br>
-                            Making this the first true generator on the Internet. It uses a dictionary of over 200 Latin words.
-                            <br>
-                            <small class="text-muted">12.06.2014</small>
-                        </div>
-                    </div>
                 </div>
-            -->
+            
         <div class="social-footer">
            <div class="social-comment" style="display: flex;">
                <span class="comment-avatar float-left" style="margin-top: 10px;">
-                   <a href=""><img class="rounded-circle" src="http://www.themashabrand.com/templates/bootsnipp/post/assets/img/users/6.jpg" alt="..."></a>                            
+                   <a href=""><img class="rounded-circle" [src]="currentUser.pictureURL" alt="..."></a>                            
                   </span>
                <div class="media-body">
-                   <textarea class="form-control" placeholder="Write comment..."></textarea>
+                   <textarea 
+                        class="form-control" 
+                        (keyup.enter)="addComment($event, post.postId)" 
+                        name="comment" 
+                        [ngModel]="mapNewCommentToPost.get(post.postId)"
+                        (ngModelChange)="mapNewCommentToPost.set(post.postId, $event)" 
+                        placeholder="Write comment..." >
+                    </textarea>
                </div>
-               <button class="btn" style="background-color: rgb(69, 0, 61); color:white; border-color:rgb(69, 0, 61); margin-top: 10px; margin-bottom: 10px;"> Post</button>
+               <button class="btn" (click)="addComment($event, post.postId)" style="background-color: rgb(69, 0, 61); color:white; border-color:rgb(69, 0, 61); margin-top: 10px; margin-bottom: 10px;"> Post</button>
            </div>
        </div>		       
        </div>

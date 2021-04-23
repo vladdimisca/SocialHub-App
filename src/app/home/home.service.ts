@@ -19,4 +19,12 @@ export class HomeService {
     getFriendsPostsByEmail(email: string, page: number = 1): Observable<any> {
         return this.httpClient.get('http://localhost:3000/api/getFriendsPostsByEmail?email=' + email + '&page=' + page);
     }
+
+    getCommentsByPostId(postId: string): Observable<any> {
+        return this.httpClient.get('http://localhost:3000/api/getCommentsByPostId?postId=' + postId);
+    }
+    
+    getLikesByPostId(postId: string): Observable<any> {
+        return this.httpClient.get('http://localhost:3000/api/getLikesByPostId?postId=' + postId);
+    }
 }

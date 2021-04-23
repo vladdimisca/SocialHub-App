@@ -18,6 +18,9 @@ import { SettingsComponent } from './settings/settings.component';
 import { GlobalService } from '../utils/global.service';
 import { ProfileService } from './profile.service';
 
+// pipes
+import { DateAgoModule } from '../utils/date-ago/date-ago.module';
+
 // interceptors
 import { JwtInterceptor } from '../utils/interceptors/jwt.interceptor';
 import { ErrorInterceptor } from '../utils/interceptors/error.interceptor';
@@ -35,7 +38,8 @@ import { ErrorInterceptor } from '../utils/interceptors/error.interceptor';
         FormsModule,
         ProfileRoutingModule,
         NavbarModule,
-        HttpClientModule
+        HttpClientModule,
+        DateAgoModule
     ],
     providers: [
         { provide: HTTP_INTERCEPTORS, useClass: JwtInterceptor, multi: true },

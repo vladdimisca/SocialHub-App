@@ -1,14 +1,91 @@
 <div class="mygallery">
     <div *ngFor="let post of posts" class="frame-square">
         <div (click)="startOverlay(post)" class="square">
-                <img [src]="post.pictureURL" class="img-responsive square-photo"> 
+                <img [src]="post.pictureURL" class="img-responsive square-photo1"> 
          </div>
     </div>  
-    <div *ngIf="overlay === true" id="overlay" (click)="stopOverlay()">
+    <div *ngIf="overlay === true" id="overlay" (click)="stopOverlay($event)">
         <div class="row absolute">
-            <div class="big-frame-square">
-                <img [src]="displayedPost.pictureURL" class="img-responsive square-photo">
-            </div>
+            <div class="photo-container">
+                <img [src]="displayedPost.pictureURL" class="flex-item" style="flex-grow: 0;">
+
+                <div class="flex-item" style="flex-grow: 0.5;">
+                        <div class="cardbox-heading" style="padding: 10px;">
+                            <div class="media m-0">
+                                <div class="d-flex mr-3">
+                                    <a ><img class="img-fluid rounded-circle" [src]="displayedUser.pictureURL" alt="picture"></a>
+                                </div>
+                                <div class="media-body">
+                                    <a class="remove-href-style">
+                                        <h5 class="m-0" > {{displayedUser.firstName}} {{displayedUser.lastName}} </h5>
+                                    </a>
+                                    <small>
+                                        <span>
+                                            <i class="icon ion-md-time"></i>  {{ displayedPost.timestamp | dateAgo}}
+                                        </span>
+                                    </small>
+                                </div>
+                            </div>
+                        </div>
+            
+                        <div class="cardbox-item">
+                            <div style="margin: 15px; text-align: justify;">
+                                <p class="pResp">
+                                    {{ displayedPost.description }}
+                                </p>
+                            </div>
+                        </div>
+        
+                        <div class="cardbox-base">
+                            <ul>
+                                <li><button class="btn" (click)="addLike(displayedPost.postId)" style="background-color: rgb(69, 0, 61); color:white; border-color:rgb(69, 0, 61);" ><i [ngClass]="icon" > Like</i></button></li>
+                                <li><a><span *ngIf="likes !== undefined"> {{ likes.length }} Likes</span></a></li>
+                            </ul>			   
+                        </div>
+
+                        <div class="overflow" >
+                            <div class="social-footer" *ngFor="let comment of comments">
+                                <div style="padding: 10px;" class="social-comment">
+                                    <span class="comment-avatar float-left" style="margin-top: 10px; padding-right: 10px;">
+                                        <a href="'profile/' + comment.senderEmail"><img *ngIf="mapUserToComment.get(comment.commentId) !== undefined" class="img-fluid rounded-circle" [src]="mapUserToComment.get(comment.commentId).pictureURL" alt="..."></a>                            
+                                    </span>
+                                    <div class="media-body">
+                                        <a *ngIf="mapUserToComment.get(comment.commentId) !== undefined" [href]="'profile/' + comment.senderEmail" class="name">
+                                            {{ mapUserToComment.get(comment.commentId).firstName }}
+                                            {{ mapUserToComment.get(comment.commentId).lastName }}
+                                        </a>
+                                        <div *ngIf="mapUserToComment.get(comment.commentId) !== undefined" (click)="deleteComment(comment.commentId, comment.postId)" href="#" class="del_photo" id=""><i *ngIf="mapUserToComment.get(comment.commentId).email === currentUserEmail" class="fas fa-times"></i></div>
+                                        <br>
+                                        {{ comment.text }}
+                                        <br>
+                                        <small class="text-muted">{{ comment.timestamp | dateAgo }}</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    
+                        <div class="social-footer" style="bottom: 0; overflow: visible; " >
+                            <div class="social-comment" style="display: flex;">
+                                <span class="comment-avatar float-left" style="margin-top: 10px;">
+                                    <a href=""><img class="rounded-circle" [src]="currentUser.pictureURL" alt="..."></a>                            
+                                    </span>
+                                <div class="media-body">
+                                    <textarea 
+                                        class="form-control" 
+                                        (keyup.enter)="addComment($event, displayedPost.postId)" 
+                                        name="comment" 
+                                        [ngModel]="newComment"
+                                        (ngModelChange)="newComment = $event" 
+                                        placeholder="Write comment..." >
+                                    </textarea>
+                                </div>
+                                <button class="btn" (click)="addComment($event, displayedPost.postId)" style="background-color: rgb(69, 0, 61); color:white; border-color:rgb(69, 0, 61); margin-top: 10px; margin-bottom: 10px;"> Post</button>
+                            </div>
+                        </div>		        
+    
+                </div>
+                    
+            </div>		    
         </div>
     </div>
  </div>
